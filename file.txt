@@ -1,0 +1,12 @@
+fun main () {
+	var i: int = 5;
+	var j: real = 65.2323;
+	var resultAdd: int = j + i;
+	var resultMin: int = j - i;
+	var resultMul: int = j * i;
+	var resultDiv: real = j / i;
+	print( resultAdd );
+	println( resultMin );
+	println( resultMul );
+	println( resultDiv );
+}
