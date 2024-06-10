@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <cstring>
 
+#define MIN(i, j) (((i) < (j)) ? (i) : (j))
+#define MAX(i, j) (((i) > (j)) ? (i) : (j))
+
 using namespace std;
 
 typedef enum { INT_TYPE, REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE } var_type;

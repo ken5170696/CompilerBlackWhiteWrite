@@ -1,8 +1,13 @@
 fun main () {
-	var arrVal: real[16] = { 0, -1.2, 2, 3, 4 };
+	var arriVal: int[5] = { 0, -1.2, 2, 3, 4 };
+	var arrfVal: real[5] = { -6, 1.2, 2, 3, 4 };
+	var arrAddResult: real[10] = arriVal + arrfVal;
+	var arrMinResult: real[10] = arriVal - arrfVal;
+	var arrMulResult: real = arriVal * arrfVal;
+	var arrDivResult: real = arriVal / arrfVal;
 	var i: int; /// sfdsdf /* 
-	i = 688.235; 
-	var j: real = -65.2323;
+	i = 68.235; 
+	var j: real = -9999.2323;
 	var resultAdd: int = j + i;
 	var resultMin: int = j - i;
 	/* var resultMul: int = j * i;
