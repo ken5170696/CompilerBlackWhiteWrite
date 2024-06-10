@@ -1,4 +1,5 @@
 fun main () {
+	var arrVal: real[16] = { 0, 1.2, 2, 3, 4 };
 	var i: int; /// sfdsdf /* 
 	i = 688.235; 
 	var j: real = 65.2323;

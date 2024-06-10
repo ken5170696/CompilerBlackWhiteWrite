@@ -99,13 +99,21 @@ union YYSTYPE
     
     struct {
         int is_real;
+        int is_array;
         union {
             int intNum;
             float realNum;
+            float* arrayNum;
         } value;
+        int arrayLength;
     } expr_val;
 
-#line 109 "yacc.tab.h"
+    struct {
+        int arrayLength;
+        var_type varType;
+    } type_val;
+
+#line 117 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
