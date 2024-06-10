@@ -15,7 +15,7 @@ int main() {
 	int k = 3;
 	int resultAdd = 3;
 	int resultMin = 1;
-	float complexMath = 2.000000;
+	float complexMath = 37.000000;
 	printf("3\n");
 	printf("1\n");
 

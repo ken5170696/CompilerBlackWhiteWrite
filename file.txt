@@ -13,7 +13,7 @@ fun main () {
 	var resultMin: int = j - i;
 	/* var resultMul: int = j * i;
 	var resultDiv: real = j / i; */
-	var complexMath: real = i + j * k - (5);
+	var complexMath: real = i + j * k - -( 6 * 5);
 	println( resultAdd );
 	println( resultMin );
 	// println( resultMul );
