@@ -4,6 +4,7 @@
 void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
+extern FILE* output_file;
 
 typedef struct SymbolTableNode {
     variable var;
@@ -55,8 +56,8 @@ variable *lookup_variable(char *name) {
 %token FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL
 %token LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 
+%type <str> function statement_list statement variable_declaration assignment print_statement
 %type <expr_val> expr value
-%type <var> variable_declaration assignment
 %type <varType> type
 
 %left '+' '-'
@@ -66,22 +67,48 @@ variable *lookup_variable(char *name) {
 %%
 
 program:
-    function
+    function {
+            printf("#include <stdio.h>\n\n%s", $1);
+        }
+        ;
 ;
 
 function:
-    FUN MAIN LPAREN RPAREN LBRACE statement_list RBRACE
+    FUN MAIN LPAREN RPAREN LBRACE statement_list RBRACE{
+            $$ = (char*)malloc(strlen($6) + 52);
+            sprintf($$, "int main() {\n%s\n\treturn 0;\n}\n", $6);
+        }
 ;
 
 statement_list:
-    statement_list statement
-    | statement
+    statement_list statement{
+                    char* temp = (char*)malloc(strlen($1) + strlen($2) + 5);
+                    strcpy(temp, "\t");
+                    strcpy(temp, $1);
+                    strcat(temp, "\t");
+                    strcat(temp, $2);
+                    $$ = temp;
+                }
+    | statement {
+                    char* temp = (char*)malloc(strlen($1) + 3);
+                    strcpy(temp, "\t");
+                    strcat(temp, $1);
+                    $$ = temp;
+                }
 ;
 
 statement:
-	variable_declaration
-    | assignment
-	| print_statement
+	variable_declaration {
+            $$ = $1;
+        }
+    | assignment {
+            char* temp = (char*)malloc(8);
+            sprintf(temp, "int ;\n");
+            $$ = temp;
+        }
+	| print_statement {
+            $$ = $1;
+        }
 ;
 
 variable_declaration:
@@ -94,6 +121,14 @@ variable_declaration:
             yyerror("Variable already declared");
         } else {
             insert_variable(var);
+        }
+
+        if($4 == INT_TYPE){
+            $$ = (char*)malloc(strlen(var.name) + 11);
+            sprintf($$, "int %s;\n", var.name);
+        }else if($4 == REAL_TYPE){
+            $$ = (char*)malloc(strlen(var.name) + 13);
+            sprintf($$, "float %s;\n", var.name);
         }
     }
     | VAR IDENTIFIER COLON type ASSIGN expr SEMICOLON
@@ -110,12 +145,18 @@ variable_declaration:
 		        } else {
 		            var.value.ival = $6.value.intNum;
 		        }
+                int length = snprintf( NULL, 0, "%d", var.value.ival );
+                $$ = (char*)malloc(length + strlen(var.name) + 15);
+                sprintf($$, "int %s = %d;\n", var.name, var.value.ival);
             } else if ($4 == REAL_TYPE) {
 		        if ($6.is_real) {
 		            var.value.rval = $6.value.realNum;
 		        } else {
 		            var.value.rval = $6.value.intNum;
 		        }
+                int length = snprintf( NULL, 0, "%f", var.value.rval );
+                $$ = (char*)malloc(length + strlen(var.name) + 17);
+                sprintf($$, "float %s = %f;\n", var.name, var.value.rval);
             }
             insert_variable(var);
         }
@@ -135,12 +176,16 @@ assignment:
 		        } else {
 		            var->value.ival = $3.value.intNum;
 		        }
+                $$ = (char*)malloc(strlen(var->name) + 11);
+                sprintf($$, "%s = %d;\n", var->name, var->value.ival);
             } else if (var->type == REAL_TYPE) {
 		        if ($3.is_real) {
 		            var->value.rval = $3.value.realNum;
 		        } else {
 		            var->value.rval = $3.value.intNum;
 		        }
+                $$ = (char*)malloc(strlen(var->name) + 11);
+                sprintf($$, "%s = %f;\n", var->name, var->value.rval);
             }
         }
     }
@@ -148,23 +193,40 @@ assignment:
 
 print_statement:
     PRINT LPAREN expr RPAREN SEMICOLON 		{ 
-    	if($3.is_real)
-    		printf("%f", $3.value.realNum); 
-    	else
-    		printf("%d", $3.value.intNum); 
+    	if($3.is_real){
+    		printf("// %f\n", $3.value.realNum); 
+            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
+            $$ = (char*)malloc(length + 18);
+            sprintf($$, "printf(\"%f\");\n", $3.value.realNum);
+        }
+    	else{
+    		printf("// %d\n", $3.value.intNum);
+            int length = snprintf( NULL, 0, "%d", $3.value.intNum );
+            $$ = (char*)malloc(length + 18);
+            sprintf($$, "printf(\"%d\");\n", $3.value.intNum);
+        }
+
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON	{ 
-    	if($3.is_real)
-    		printf("%f\n", $3.value.realNum); 
-    	else
-    		printf("%d\n", $3.value.intNum); 
+    	if($3.is_real){
+    		printf("// %f\n", $3.value.realNum); 
+            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
+            $$ = (char*)malloc(length + 22);
+            sprintf($$, "printf(\"%f\\n\");\n", $3.value.realNum);
+        }
+    	else{
+    		printf("// %d\n", $3.value.intNum);
+            int length = snprintf( NULL, 0, "%d", $3.value.intNum );
+            $$ = (char*)malloc(length + 22);
+            sprintf($$, "printf(\"%d\\n\");\n", $3.value.intNum);
+        }
     }
 ;
 
 type:
     INT { $$ = INT_TYPE; }
     | REAL { $$ = REAL_TYPE; }
-    | REAL LBRACKET INT_CONST RBRACKET
+    | REAL LBRACKET INT RBRACKET { $$ = ARRAY_TYPE; }
 ;
 
 expr:

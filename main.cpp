@@ -12,6 +12,7 @@ int main()
         printf("cannot open %s\n", sFile);
         return -1;
     }
+
     
     yyin = fp;
 
