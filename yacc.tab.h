@@ -70,17 +70,18 @@ extern int yydebug;
     TO = 271,                      /* TO  */
     INT = 272,                     /* INT  */
     REAL = 273,                    /* REAL  */
-    LBRACE = 274,                  /* LBRACE  */
-    RBRACE = 275,                  /* RBRACE  */
-    LBRACKET = 276,                /* LBRACKET  */
-    RBRACKET = 277,                /* RBRACKET  */
-    LPAREN = 278,                  /* LPAREN  */
-    RPAREN = 279,                  /* RPAREN  */
-    SEMICOLON = 280,               /* SEMICOLON  */
-    COMMA = 281,                   /* COMMA  */
-    ASSIGN = 282,                  /* ASSIGN  */
-    COLON = 283,                   /* COLON  */
-    UMINUS = 284                   /* UMINUS  */
+    NEWLINE = 274,                 /* NEWLINE  */
+    LBRACE = 275,                  /* LBRACE  */
+    RBRACE = 276,                  /* RBRACE  */
+    LBRACKET = 277,                /* LBRACKET  */
+    RBRACKET = 278,                /* RBRACKET  */
+    LPAREN = 279,                  /* LPAREN  */
+    RPAREN = 280,                  /* RPAREN  */
+    SEMICOLON = 281,               /* SEMICOLON  */
+    COMMA = 282,                   /* COMMA  */
+    ASSIGN = 283,                  /* ASSIGN  */
+    COLON = 284,                   /* COLON  */
+    UMINUS = 285                   /* UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -113,7 +114,7 @@ union YYSTYPE
         var_type varType;
     } type_val;
 
-#line 117 "yacc.tab.h"
+#line 118 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

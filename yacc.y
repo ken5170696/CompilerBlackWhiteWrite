@@ -61,7 +61,7 @@ variable *lookup_variable(char *name) {
 %token <intNum>   	INTEGER_CONST
 %token <realNum> 	REAL_CONST
 %token <str> 		IDENTIFIER
-%token FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL
+%token FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
 %token LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 
 %type <str> function statement_list statement variable_declaration assignment print_statement
@@ -70,7 +70,7 @@ variable *lookup_variable(char *name) {
 
 %left '+' '-'
 %left '*' '/'
-%right UMINUS
+%nonassoc UMINUS
 
 %%
 
@@ -257,8 +257,7 @@ variable_declaration:
     ;
 
 assignment:
-    IDENTIFIER ASSIGN expr SEMICOLON
-    {
+    IDENTIFIER ASSIGN expr SEMICOLON {
         variable *var = lookup_variable($1);
         if (!var) {
             yyerror("Variable not declared"); 
@@ -456,10 +455,16 @@ expr:
         }
     | '-' expr %prec UMINUS          
 		{ 
-			if($2.is_real)
-				$$.value.realNum = $2.value.realNum;
-			else
-				$$.value.intNum = $2.value.intNum;
+			if($2.is_real && !$2.is_array){
+				$$.value.realNum = -$2.value.realNum;
+                $$.is_real = $2.is_real;
+                $$.is_array = $2.is_array;
+            }
+			else{
+				$$.value.intNum = -$2.value.intNum;
+                $$.is_real = $2.is_real;
+                $$.is_array = $2.is_array;
+            }
 		}
     | LPAREN expr RPAREN          
 		{ 
@@ -501,10 +506,16 @@ value_list_value:
       value                 { $$ = $1; }
     | '-' value_list_value %prec UMINUS          
 		{ 
-			if($2.is_real)
-				$$.value.realNum = $2.value.realNum;
-			else
-				$$.value.intNum = $2.value.intNum;
+			if($2.is_real && !$2.is_array){
+				$$.value.realNum = -$2.value.realNum;
+                $$.is_real = $2.is_real;
+                $$.is_array = $2.is_array;
+            }
+			else{
+				$$.value.intNum = -$2.value.intNum;
+                $$.is_real = $2.is_real;
+                $$.is_array = $2.is_array;
+            }
 		}
     | LPAREN value_list_value RPAREN          
 		{ 
@@ -519,5 +530,3 @@ value_list_value:
 void yyerror(const char *s) {
     cerr << s << endl;
 }
-
-

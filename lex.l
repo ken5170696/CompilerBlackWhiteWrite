@@ -48,6 +48,7 @@ expressions 	([-+*/])
 ";"             { return SEMICOLON; }
 ":"             { return COLON; }
 ","             { return COMMA; }
+"\\n"            { return NEWLINE; }
 
 {blank_chars}   { ; }
 \n              { ; }
