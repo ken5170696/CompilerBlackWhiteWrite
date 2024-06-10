@@ -102,9 +102,7 @@ statement:
             $$ = $1;
         }
     | assignment {
-            char* temp = (char*)malloc(8);
-            sprintf(temp, "int ;\n");
-            $$ = temp;
+            $$ = $1;
         }
 	| print_statement {
             $$ = $1;
@@ -118,7 +116,8 @@ variable_declaration:
         strcpy(var.name, $2);
         var.type = $4;
         if (lookup_variable($2)) {
-            yyerror("Variable already declared");
+            yyerror("Variable already declared"); 
+            YYABORT; 
         } else {
             insert_variable(var);
         }
@@ -137,7 +136,8 @@ variable_declaration:
         strcpy(var.name, $2);
         var.type = $4;
         if (lookup_variable($2)) {
-            yyerror("Variable already declared");
+            yyerror("Variable already declared"); 
+            YYABORT; 
         } else {
             if ($4 == INT_TYPE) {
 		        if ($6.is_real) {
@@ -168,7 +168,8 @@ assignment:
     {
         variable *var = lookup_variable($1);
         if (!var) {
-            yyerror("Variable not declared");
+            yyerror("Variable not declared"); 
+            YYABORT; 
         } else {
             if (var->type == INT_TYPE) {
 		        if ($3.is_real) {
@@ -176,7 +177,8 @@ assignment:
 		        } else {
 		            var->value.ival = $3.value.intNum;
 		        }
-                $$ = (char*)malloc(strlen(var->name) + 11);
+                int length = snprintf( NULL, 0, "%d", var->value.ival );
+                $$ = (char*)malloc(length + strlen(var->name) + 11);
                 sprintf($$, "%s = %d;\n", var->name, var->value.ival);
             } else if (var->type == REAL_TYPE) {
 		        if ($3.is_real) {
@@ -184,7 +186,8 @@ assignment:
 		        } else {
 		            var->value.rval = $3.value.intNum;
 		        }
-                $$ = (char*)malloc(strlen(var->name) + 11);
+                int length = snprintf( NULL, 0, "%f", var->value.rval );
+                $$ = (char*)malloc(length + strlen(var->name) + 11);
                 sprintf($$, "%s = %f;\n", var->name, var->value.rval);
             }
         }

@@ -1,12 +1,13 @@
 fun main () {
-	var i: int = 5;
+	var i: int; /// sfdsdf /* 
+	i = 688.235; 
 	var j: real = 65.2323;
 	var resultAdd: int = j + i;
 	var resultMin: int = j - i;
-	var resultMul: int = j * i;
-	var resultDiv: real = j / i;
-	print( resultAdd );
+	/* var resultMul: int = j * i;
+	var resultDiv: real = j / i; */
+	println( resultAdd );
 	println( resultMin );
-	println( resultMul );
-	println( resultDiv );
+	// println( resultMul );
+	// println( resultDiv );
 }

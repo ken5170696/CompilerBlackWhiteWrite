@@ -563,9 +563,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    70,    70,    77,    84,    92,   101,   104,   109,   115,
-     134,   167,   195,   210,   227,   228,   229,   233,   234,   248,
-     261,   274,   287,   305,   312,   322,   323
+       0,    70,    70,    77,    84,    92,   101,   104,   107,   113,
+     133,   167,   198,   213,   230,   231,   232,   236,   237,   251,
+     264,   277,   290,   308,   315,   325,   326
 };
 #endif
 
@@ -1214,29 +1214,28 @@ yyreduce:
   case 7: /* statement: assignment  */
 #line 104 "yacc.y"
                  {
-            char* temp = (char*)malloc(8);
-            sprintf(temp, "int ;\n");
-            (yyval.str) = temp;
+            (yyval.str) = (yyvsp[0].str);
         }
-#line 1222 "yacc.tab.c"
+#line 1220 "yacc.tab.c"
     break;
 
   case 8: /* statement: print_statement  */
-#line 109 "yacc.y"
+#line 107 "yacc.y"
                           {
             (yyval.str) = (yyvsp[0].str);
         }
-#line 1230 "yacc.tab.c"
+#line 1228 "yacc.tab.c"
     break;
 
   case 9: /* variable_declaration: VAR IDENTIFIER COLON type SEMICOLON  */
-#line 116 "yacc.y"
+#line 114 "yacc.y"
     {
         variable var;
         strcpy(var.name, (yyvsp[-3].str));
         var.type = (yyvsp[-1].varType);
         if (lookup_variable((yyvsp[-3].str))) {
-            yyerror("Variable already declared");
+            yyerror("Variable already declared"); 
+            YYABORT; 
         } else {
             insert_variable(var);
         }
@@ -1249,17 +1248,18 @@ yyreduce:
             sprintf((yyval.str), "float %s;\n", var.name);
         }
     }
-#line 1253 "yacc.tab.c"
+#line 1252 "yacc.tab.c"
     break;
 
   case 10: /* variable_declaration: VAR IDENTIFIER COLON type ASSIGN expr SEMICOLON  */
-#line 135 "yacc.y"
+#line 134 "yacc.y"
     {
         variable var;
         strcpy(var.name, (yyvsp[-5].str));
         var.type = (yyvsp[-3].varType);
         if (lookup_variable((yyvsp[-5].str))) {
-            yyerror("Variable already declared");
+            yyerror("Variable already declared"); 
+            YYABORT; 
         } else {
             if ((yyvsp[-3].varType) == INT_TYPE) {
 		        if ((yyvsp[-1].expr_val).is_real) {
@@ -1291,7 +1291,8 @@ yyreduce:
     {
         variable *var = lookup_variable((yyvsp[-3].str));
         if (!var) {
-            yyerror("Variable not declared");
+            yyerror("Variable not declared"); 
+            YYABORT; 
         } else {
             if (var->type == INT_TYPE) {
 		        if ((yyvsp[-1].expr_val).is_real) {
@@ -1299,7 +1300,8 @@ yyreduce:
 		        } else {
 		            var->value.ival = (yyvsp[-1].expr_val).value.intNum;
 		        }
-                (yyval.str) = (char*)malloc(strlen(var->name) + 11);
+                int length = snprintf( NULL, 0, "%d", var->value.ival );
+                (yyval.str) = (char*)malloc(length + strlen(var->name) + 11);
                 sprintf((yyval.str), "%s = %d;\n", var->name, var->value.ival);
             } else if (var->type == REAL_TYPE) {
 		        if ((yyvsp[-1].expr_val).is_real) {
@@ -1307,16 +1309,17 @@ yyreduce:
 		        } else {
 		            var->value.rval = (yyvsp[-1].expr_val).value.intNum;
 		        }
-                (yyval.str) = (char*)malloc(strlen(var->name) + 11);
+                int length = snprintf( NULL, 0, "%f", var->value.rval );
+                (yyval.str) = (char*)malloc(length + strlen(var->name) + 11);
                 sprintf((yyval.str), "%s = %f;\n", var->name, var->value.rval);
             }
         }
     }
-#line 1316 "yacc.tab.c"
+#line 1319 "yacc.tab.c"
     break;
 
   case 12: /* print_statement: PRINT LPAREN expr RPAREN SEMICOLON  */
-#line 195 "yacc.y"
+#line 198 "yacc.y"
                                                 { 
     	if((yyvsp[-2].expr_val).is_real){
     		printf("// %f\n", (yyvsp[-2].expr_val).value.realNum); 
@@ -1332,11 +1335,11 @@ yyreduce:
         }
 
     }
-#line 1336 "yacc.tab.c"
+#line 1339 "yacc.tab.c"
     break;
 
   case 13: /* print_statement: PRINTLN LPAREN expr RPAREN SEMICOLON  */
-#line 210 "yacc.y"
+#line 213 "yacc.y"
                                                 { 
     	if((yyvsp[-2].expr_val).is_real){
     		printf("// %f\n", (yyvsp[-2].expr_val).value.realNum); 
@@ -1351,35 +1354,35 @@ yyreduce:
             sprintf((yyval.str), "printf(\"%d\\n\");\n", (yyvsp[-2].expr_val).value.intNum);
         }
     }
-#line 1355 "yacc.tab.c"
+#line 1358 "yacc.tab.c"
     break;
 
   case 14: /* type: INT  */
-#line 227 "yacc.y"
+#line 230 "yacc.y"
         { (yyval.varType) = INT_TYPE; }
-#line 1361 "yacc.tab.c"
+#line 1364 "yacc.tab.c"
     break;
 
   case 15: /* type: REAL  */
-#line 228 "yacc.y"
+#line 231 "yacc.y"
            { (yyval.varType) = REAL_TYPE; }
-#line 1367 "yacc.tab.c"
+#line 1370 "yacc.tab.c"
     break;
 
   case 16: /* type: REAL LBRACKET INT RBRACKET  */
-#line 229 "yacc.y"
+#line 232 "yacc.y"
                                  { (yyval.varType) = ARRAY_TYPE; }
-#line 1373 "yacc.tab.c"
+#line 1376 "yacc.tab.c"
     break;
 
   case 17: /* expr: value  */
-#line 233 "yacc.y"
+#line 236 "yacc.y"
                             { (yyval.expr_val) = (yyvsp[0].expr_val); }
-#line 1379 "yacc.tab.c"
+#line 1382 "yacc.tab.c"
     break;
 
   case 18: /* expr: IDENTIFIER  */
-#line 234 "yacc.y"
+#line 237 "yacc.y"
                                         {
 								variable *var = lookup_variable((yyvsp[0].str));
 								if (!var) {
@@ -1394,11 +1397,11 @@ yyreduce:
 									}
 								}
 							}
-#line 1398 "yacc.tab.c"
+#line 1401 "yacc.tab.c"
     break;
 
   case 19: /* expr: expr '+' expr  */
-#line 249 "yacc.y"
+#line 252 "yacc.y"
         {
         	float v1 = (yyvsp[-2].expr_val).is_real ? (yyvsp[-2].expr_val).value.realNum : (yyvsp[-2].expr_val).value.intNum;
         	float v2 = (yyvsp[0].expr_val).is_real ? (yyvsp[0].expr_val).value.realNum : (yyvsp[0].expr_val).value.intNum;
@@ -1411,11 +1414,11 @@ yyreduce:
         		(yyval.expr_val).value.intNum = (v1 + v2);
         	}
         }
-#line 1415 "yacc.tab.c"
+#line 1418 "yacc.tab.c"
     break;
 
   case 20: /* expr: expr '-' expr  */
-#line 262 "yacc.y"
+#line 265 "yacc.y"
         {
         	float v1 = (yyvsp[-2].expr_val).is_real ? (yyvsp[-2].expr_val).value.realNum : (yyvsp[-2].expr_val).value.intNum;
         	float v2 = (yyvsp[0].expr_val).is_real ? (yyvsp[0].expr_val).value.realNum : (yyvsp[0].expr_val).value.intNum;
@@ -1428,11 +1431,11 @@ yyreduce:
         		(yyval.expr_val).value.intNum = (v1 - v2);
         	}
         }
-#line 1432 "yacc.tab.c"
+#line 1435 "yacc.tab.c"
     break;
 
   case 21: /* expr: expr '*' expr  */
-#line 275 "yacc.y"
+#line 278 "yacc.y"
         {
         	float v1 = (yyvsp[-2].expr_val).is_real ? (yyvsp[-2].expr_val).value.realNum : (yyvsp[-2].expr_val).value.intNum;
         	float v2 = (yyvsp[0].expr_val).is_real ? (yyvsp[0].expr_val).value.realNum : (yyvsp[0].expr_val).value.intNum;
@@ -1445,11 +1448,11 @@ yyreduce:
         		(yyval.expr_val).value.intNum = (v1 * v2);
         	}
         }
-#line 1449 "yacc.tab.c"
+#line 1452 "yacc.tab.c"
     break;
 
   case 22: /* expr: expr '/' expr  */
-#line 288 "yacc.y"
+#line 291 "yacc.y"
         {
         	float v1 = (yyvsp[-2].expr_val).is_real ? (yyvsp[-2].expr_val).value.realNum : (yyvsp[-2].expr_val).value.intNum;
         	float v2 = (yyvsp[0].expr_val).is_real ? (yyvsp[0].expr_val).value.realNum : (yyvsp[0].expr_val).value.intNum;
@@ -1467,45 +1470,45 @@ yyreduce:
             	}
             } 
         }
-#line 1471 "yacc.tab.c"
+#line 1474 "yacc.tab.c"
     break;
 
   case 23: /* expr: '-' expr  */
-#line 306 "yacc.y"
+#line 309 "yacc.y"
                 { 
 			if((yyvsp[0].expr_val).is_real)
 				(yyval.expr_val).value.realNum = (yyvsp[0].expr_val).value.realNum;
 			else
 				(yyval.expr_val).value.intNum = (yyvsp[0].expr_val).value.intNum;
 		}
-#line 1482 "yacc.tab.c"
+#line 1485 "yacc.tab.c"
     break;
 
   case 24: /* expr: LPAREN expr RPAREN  */
-#line 313 "yacc.y"
+#line 316 "yacc.y"
                 { 
 			if((yyvsp[-1].expr_val).is_real)
 				(yyval.expr_val).value.realNum = (yyvsp[-1].expr_val).value.realNum;
 			else
 				(yyval.expr_val).value.intNum = (yyvsp[-1].expr_val).value.intNum;
 		}
-#line 1493 "yacc.tab.c"
+#line 1496 "yacc.tab.c"
     break;
 
   case 25: /* value: REAL_CONST  */
-#line 322 "yacc.y"
+#line 325 "yacc.y"
                                  { (yyval.expr_val).value.realNum = (yyvsp[0].realNum); (yyval.expr_val).is_real = 1;}
-#line 1499 "yacc.tab.c"
+#line 1502 "yacc.tab.c"
     break;
 
   case 26: /* value: INTEGER_CONST  */
-#line 323 "yacc.y"
+#line 326 "yacc.y"
                                   { (yyval.expr_val).value.intNum = (float)(yyvsp[0].intNum);  (yyval.expr_val).is_real = 0;}
-#line 1505 "yacc.tab.c"
+#line 1508 "yacc.tab.c"
     break;
 
 
-#line 1509 "yacc.tab.c"
+#line 1512 "yacc.tab.c"
 
       default: break;
     }
@@ -1698,7 +1701,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 326 "yacc.y"
+#line 329 "yacc.y"
 
 
 void yyerror(const char *s) {

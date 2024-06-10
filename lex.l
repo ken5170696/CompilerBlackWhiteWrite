@@ -12,7 +12,11 @@ real            {digit}+"."{digit}+
 blank_chars 	([ \f\r\t\v]+)
 expressions 	([-+*/])
 
+%x COMMENT
 %%
+
+"//"(.)*\n   /* Ignore single-line comments */
+"/*"([^*]|\*+[^*/])*\*+"/"  /* Ignore multi-line comments */
 
 "fun"           { return FUN; }
 "main"          { return MAIN; }
