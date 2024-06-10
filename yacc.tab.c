@@ -165,19 +165,20 @@ enum yysymbol_kind_t
   YYSYMBOL_32_ = 32,                       /* '*'  */
   YYSYMBOL_33_ = 33,                       /* '/'  */
   YYSYMBOL_UMINUS = 34,                    /* UMINUS  */
-  YYSYMBOL_YYACCEPT = 35,                  /* $accept  */
-  YYSYMBOL_program = 36,                   /* program  */
-  YYSYMBOL_function = 37,                  /* function  */
-  YYSYMBOL_statement_list = 38,            /* statement_list  */
-  YYSYMBOL_statement = 39,                 /* statement  */
-  YYSYMBOL_variable_declaration = 40,      /* variable_declaration  */
-  YYSYMBOL_assignment = 41,                /* assignment  */
-  YYSYMBOL_print_statement = 42,           /* print_statement  */
-  YYSYMBOL_type = 43,                      /* type  */
-  YYSYMBOL_expr = 44,                      /* expr  */
-  YYSYMBOL_value = 45,                     /* value  */
-  YYSYMBOL_value_list = 46,                /* value_list  */
-  YYSYMBOL_value_list_value = 47           /* value_list_value  */
+  YYSYMBOL_PAREN = 35,                     /* PAREN  */
+  YYSYMBOL_YYACCEPT = 36,                  /* $accept  */
+  YYSYMBOL_program = 37,                   /* program  */
+  YYSYMBOL_function = 38,                  /* function  */
+  YYSYMBOL_statement_list = 39,            /* statement_list  */
+  YYSYMBOL_statement = 40,                 /* statement  */
+  YYSYMBOL_variable_declaration = 41,      /* variable_declaration  */
+  YYSYMBOL_assignment = 42,                /* assignment  */
+  YYSYMBOL_print_statement = 43,           /* print_statement  */
+  YYSYMBOL_type = 44,                      /* type  */
+  YYSYMBOL_expr = 45,                      /* expr  */
+  YYSYMBOL_value = 46,                     /* value  */
+  YYSYMBOL_value_list = 47,                /* value_list  */
+  YYSYMBOL_value_list_value = 48           /* value_list_value  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -508,7 +509,7 @@ union yyalloc
 #define YYLAST   88
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  35
+#define YYNTOKENS  36
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
@@ -517,7 +518,7 @@ union yyalloc
 #define YYNSTATES  75
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   285
+#define YYMAXUTOK   286
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -559,17 +560,17 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    34
+      25,    26,    27,    28,    29,    34,    35
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    78,    78,    85,    92,   100,   109,   112,   115,   121,
-     157,   260,   317,   338,   359,   360,   361,   362,   366,   367,
-     399,   436,   475,   519,   571,   584,   591,   597,   602,   610,
-     618,   629,   630,   645
+       0,    79,    79,    86,    93,   101,   110,   113,   116,   122,
+     158,   261,   318,   339,   360,   361,   362,   363,   367,   368,
+     400,   437,   476,   520,   572,   585,   589,   595,   600,   608,
+     616,   627,   628,   643
 };
 #endif
 
@@ -590,7 +591,7 @@ static const char *const yytname[] =
   "RET", "IF", "ELSE", "WHILE", "FOR", "TO", "INT", "REAL", "NEWLINE",
   "LBRACE", "RBRACE", "LBRACKET", "RBRACKET", "LPAREN", "RPAREN",
   "SEMICOLON", "COMMA", "ASSIGN", "COLON", "'+'", "'-'", "'*'", "'/'",
-  "UMINUS", "$accept", "program", "function", "statement_list",
+  "UMINUS", "PAREN", "$accept", "program", "function", "statement_list",
   "statement", "variable_declaration", "assignment", "print_statement",
   "type", "expr", "value", "value_list", "value_list_value", YY_NULLPTR
 };
@@ -688,23 +689,23 @@ static const yytype_int8 yycheck[] =
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     6,    36,    37,     7,     0,    24,    25,    20,     5,
-       8,     9,    10,    38,    39,    40,    41,    42,    28,     5,
-      24,    24,    21,    39,     3,     4,     5,    20,    24,    31,
-      44,    45,    29,    44,    44,    24,    31,    45,    46,    47,
-      44,    44,    26,    30,    31,    32,    33,    17,    18,    43,
-      25,    25,    47,    47,    21,    27,    25,    44,    44,    44,
-      44,    22,    22,    26,    28,    26,    26,    25,    47,     3,
-       3,    44,    23,    23,    26
+       0,     6,    37,    38,     7,     0,    24,    25,    20,     5,
+       8,     9,    10,    39,    40,    41,    42,    43,    28,     5,
+      24,    24,    21,    40,     3,     4,     5,    20,    24,    31,
+      45,    46,    29,    45,    45,    24,    31,    46,    47,    48,
+      45,    45,    26,    30,    31,    32,    33,    17,    18,    44,
+      25,    25,    48,    48,    21,    27,    25,    45,    45,    45,
+      45,    22,    22,    26,    28,    26,    26,    25,    48,     3,
+       3,    45,    23,    23,    26
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    35,    36,    37,    38,    38,    39,    39,    39,    40,
-      40,    41,    42,    42,    43,    43,    43,    43,    44,    44,
-      44,    44,    44,    44,    44,    44,    44,    45,    45,    46,
-      46,    47,    47,    47
+       0,    36,    37,    38,    39,    39,    40,    40,    40,    41,
+      41,    42,    43,    43,    44,    44,    44,    44,    45,    45,
+      45,    45,    45,    45,    45,    45,    45,    46,    46,    47,
+      47,    48,    48,    48
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1177,24 +1178,24 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: function  */
-#line 78 "yacc.y"
+#line 79 "yacc.y"
              {
             printf("#include <stdio.h>\n\n%s", (yyvsp[0].str));
         }
-#line 1185 "yacc.tab.c"
+#line 1186 "yacc.tab.c"
     break;
 
   case 3: /* function: FUN MAIN LPAREN RPAREN LBRACE statement_list RBRACE  */
-#line 85 "yacc.y"
+#line 86 "yacc.y"
                                                        {
             (yyval.str) = (char*)malloc(strlen((yyvsp[-1].str)) + 52);
             sprintf((yyval.str), "int main() {\n%s\n\treturn 0;\n}\n", (yyvsp[-1].str));
         }
-#line 1194 "yacc.tab.c"
+#line 1195 "yacc.tab.c"
     break;
 
   case 4: /* statement_list: statement_list statement  */
-#line 92 "yacc.y"
+#line 93 "yacc.y"
                             {
                     char* temp = (char*)malloc(strlen((yyvsp[-1].str)) + strlen((yyvsp[0].str)) + 5);
                     strcpy(temp, "\t");
@@ -1203,46 +1204,46 @@ yyreduce:
                     strcat(temp, (yyvsp[0].str));
                     (yyval.str) = temp;
                 }
-#line 1207 "yacc.tab.c"
+#line 1208 "yacc.tab.c"
     break;
 
   case 5: /* statement_list: statement  */
-#line 100 "yacc.y"
+#line 101 "yacc.y"
                 {
                     char* temp = (char*)malloc(strlen((yyvsp[0].str)) + 3);
                     strcpy(temp, "\t");
                     strcat(temp, (yyvsp[0].str));
                     (yyval.str) = temp;
                 }
-#line 1218 "yacc.tab.c"
+#line 1219 "yacc.tab.c"
     break;
 
   case 6: /* statement: variable_declaration  */
-#line 109 "yacc.y"
+#line 110 "yacc.y"
                              {
             (yyval.str) = (yyvsp[0].str);
         }
-#line 1226 "yacc.tab.c"
+#line 1227 "yacc.tab.c"
     break;
 
   case 7: /* statement: assignment  */
-#line 112 "yacc.y"
+#line 113 "yacc.y"
                  {
             (yyval.str) = (yyvsp[0].str);
         }
-#line 1234 "yacc.tab.c"
+#line 1235 "yacc.tab.c"
     break;
 
   case 8: /* statement: print_statement  */
-#line 115 "yacc.y"
+#line 116 "yacc.y"
                           {
             (yyval.str) = (yyvsp[0].str);
         }
-#line 1242 "yacc.tab.c"
+#line 1243 "yacc.tab.c"
     break;
 
   case 9: /* variable_declaration: VAR IDENTIFIER COLON type SEMICOLON  */
-#line 121 "yacc.y"
+#line 122 "yacc.y"
                                         {
         variable var;
         strcpy(var.name, (yyvsp[-3].str));
@@ -1279,11 +1280,11 @@ yyreduce:
             sprintf((yyval.str), "float %s[%d];\n", var.name, (yyvsp[-1].type_val).arrayLength);
         }
     }
-#line 1283 "yacc.tab.c"
+#line 1284 "yacc.tab.c"
     break;
 
   case 10: /* variable_declaration: VAR IDENTIFIER COLON type ASSIGN expr SEMICOLON  */
-#line 157 "yacc.y"
+#line 158 "yacc.y"
                                                       {
         variable var;
         strcpy(var.name, (yyvsp[-5].str));
@@ -1384,11 +1385,11 @@ yyreduce:
             insert_variable(var);
         }
     }
-#line 1388 "yacc.tab.c"
+#line 1389 "yacc.tab.c"
     break;
 
   case 11: /* assignment: IDENTIFIER ASSIGN expr SEMICOLON  */
-#line 260 "yacc.y"
+#line 261 "yacc.y"
                                      {
         variable *var = lookup_variable((yyvsp[-3].str));
         if (!var) {
@@ -1443,11 +1444,11 @@ yyreduce:
             }
         }
     }
-#line 1447 "yacc.tab.c"
+#line 1448 "yacc.tab.c"
     break;
 
   case 12: /* print_statement: PRINT LPAREN expr RPAREN SEMICOLON  */
-#line 317 "yacc.y"
+#line 318 "yacc.y"
                                                 { 
 
         if((yyvsp[-2].expr_val).is_array){
@@ -1469,11 +1470,11 @@ yyreduce:
         }
 
     }
-#line 1473 "yacc.tab.c"
+#line 1474 "yacc.tab.c"
     break;
 
   case 13: /* print_statement: PRINTLN LPAREN expr RPAREN SEMICOLON  */
-#line 338 "yacc.y"
+#line 339 "yacc.y"
                                                 { 
         if((yyvsp[-2].expr_val).is_array){
             yyerror("Array cannot be print out"); 
@@ -1492,41 +1493,41 @@ yyreduce:
             sprintf((yyval.str), "printf(\"%d\\n\");\n", (yyvsp[-2].expr_val).value.intNum);
         }
     }
-#line 1496 "yacc.tab.c"
+#line 1497 "yacc.tab.c"
     break;
 
   case 14: /* type: INT  */
-#line 359 "yacc.y"
+#line 360 "yacc.y"
         { (yyval.type_val).varType = INT_TYPE; }
-#line 1502 "yacc.tab.c"
+#line 1503 "yacc.tab.c"
     break;
 
   case 15: /* type: REAL  */
-#line 360 "yacc.y"
+#line 361 "yacc.y"
            { (yyval.type_val).varType = REAL_TYPE; }
-#line 1508 "yacc.tab.c"
+#line 1509 "yacc.tab.c"
     break;
 
   case 16: /* type: REAL LBRACKET INTEGER_CONST RBRACKET  */
-#line 361 "yacc.y"
+#line 362 "yacc.y"
                                            { (yyval.type_val).varType = REAL_ARRAY_TYPE; (yyval.type_val).arrayLength = (yyvsp[-1].intNum); }
-#line 1514 "yacc.tab.c"
+#line 1515 "yacc.tab.c"
     break;
 
   case 17: /* type: INT LBRACKET INTEGER_CONST RBRACKET  */
-#line 362 "yacc.y"
+#line 363 "yacc.y"
                                           { (yyval.type_val).varType = INT_ARRAY_TYPE; (yyval.type_val).arrayLength = (yyvsp[-1].intNum); }
-#line 1520 "yacc.tab.c"
+#line 1521 "yacc.tab.c"
     break;
 
   case 18: /* expr: value  */
-#line 366 "yacc.y"
+#line 367 "yacc.y"
                             { (yyval.expr_val) = (yyvsp[0].expr_val); }
-#line 1526 "yacc.tab.c"
+#line 1527 "yacc.tab.c"
     break;
 
   case 19: /* expr: IDENTIFIER  */
-#line 367 "yacc.y"
+#line 368 "yacc.y"
                                         {
 								variable *var = lookup_variable((yyvsp[0].str));
 								if (!var) {
@@ -1559,11 +1560,11 @@ yyreduce:
 									}
 								}
 							}
-#line 1563 "yacc.tab.c"
+#line 1564 "yacc.tab.c"
     break;
 
   case 20: /* expr: expr '+' expr  */
-#line 400 "yacc.y"
+#line 401 "yacc.y"
         {
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
@@ -1600,11 +1601,11 @@ yyreduce:
                 }
             }
         }
-#line 1604 "yacc.tab.c"
+#line 1605 "yacc.tab.c"
     break;
 
   case 21: /* expr: expr '-' expr  */
-#line 437 "yacc.y"
+#line 438 "yacc.y"
         {
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
@@ -1643,11 +1644,11 @@ yyreduce:
                 }
             }
         }
-#line 1647 "yacc.tab.c"
+#line 1648 "yacc.tab.c"
     break;
 
   case 22: /* expr: expr '*' expr  */
-#line 476 "yacc.y"
+#line 477 "yacc.y"
         {
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
@@ -1691,11 +1692,11 @@ yyreduce:
                 }
             }
         }
-#line 1695 "yacc.tab.c"
+#line 1696 "yacc.tab.c"
     break;
 
   case 23: /* expr: expr '/' expr  */
-#line 520 "yacc.y"
+#line 521 "yacc.y"
         {
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
@@ -1747,11 +1748,11 @@ yyreduce:
                 } 
             }
         }
-#line 1751 "yacc.tab.c"
+#line 1752 "yacc.tab.c"
     break;
 
   case 24: /* expr: '-' expr  */
-#line 572 "yacc.y"
+#line 573 "yacc.y"
                 { 
 			if((yyvsp[0].expr_val).is_real && !(yyvsp[0].expr_val).is_array){
 				(yyval.expr_val).value.realNum = -(yyvsp[0].expr_val).value.realNum;
@@ -1764,50 +1765,47 @@ yyreduce:
                 (yyval.expr_val).is_array = (yyvsp[0].expr_val).is_array;
             }
 		}
-#line 1768 "yacc.tab.c"
+#line 1769 "yacc.tab.c"
     break;
 
   case 25: /* expr: LPAREN expr RPAREN  */
-#line 585 "yacc.y"
-                { 
-			if((yyvsp[-1].expr_val).is_real)
-				(yyval.expr_val).value.realNum = (yyvsp[-1].expr_val).value.realNum;
-			else
-				(yyval.expr_val).value.intNum = (yyvsp[-1].expr_val).value.intNum;
+#line 586 "yacc.y"
+                {
+            (yyval.expr_val) = (yyvsp[-1].expr_val); 
 		}
-#line 1779 "yacc.tab.c"
+#line 1777 "yacc.tab.c"
     break;
 
   case 26: /* expr: LBRACE value_list RBRACE  */
-#line 591 "yacc.y"
+#line 589 "yacc.y"
                                {
         (yyval.expr_val) = (yyvsp[-1].expr_val); 
     }
-#line 1787 "yacc.tab.c"
+#line 1785 "yacc.tab.c"
     break;
 
   case 27: /* value: REAL_CONST  */
-#line 597 "yacc.y"
+#line 595 "yacc.y"
                                  { 
         (yyval.expr_val).value.realNum = (yyvsp[0].realNum); 
         (yyval.expr_val).is_real = 1; 
         (yyval.expr_val).is_array = 0; 
     }
-#line 1797 "yacc.tab.c"
+#line 1795 "yacc.tab.c"
     break;
 
   case 28: /* value: INTEGER_CONST  */
-#line 602 "yacc.y"
+#line 600 "yacc.y"
                                   { 
         (yyval.expr_val).value.intNum = (float)(yyvsp[0].intNum);  
         (yyval.expr_val).is_real = 0; 
         (yyval.expr_val).is_array = 0;
     }
-#line 1807 "yacc.tab.c"
+#line 1805 "yacc.tab.c"
     break;
 
   case 29: /* value_list: value_list COMMA value_list_value  */
-#line 610 "yacc.y"
+#line 608 "yacc.y"
                                       {
             const int len = (yyvsp[-2].expr_val).arrayLength + 1;
             float* fPtr = (float *)(realloc((yyvsp[-2].expr_val).value.arrayNum, (len) * sizeof(float)));
@@ -1816,11 +1814,11 @@ yyreduce:
             (yyval.expr_val).arrayLength = len;
             (yyval.expr_val).is_array = 1;
         }
-#line 1820 "yacc.tab.c"
+#line 1818 "yacc.tab.c"
     break;
 
   case 30: /* value_list: value_list_value  */
-#line 618 "yacc.y"
+#line 616 "yacc.y"
                        {
             (yyval.expr_val).value.arrayNum = (float *)malloc(sizeof(float));
             
@@ -1828,17 +1826,17 @@ yyreduce:
             (yyval.expr_val).arrayLength = 1;
             (yyval.expr_val).is_array = 1;
         }
-#line 1832 "yacc.tab.c"
+#line 1830 "yacc.tab.c"
     break;
 
   case 31: /* value_list_value: value  */
-#line 629 "yacc.y"
+#line 627 "yacc.y"
                             { (yyval.expr_val) = (yyvsp[0].expr_val); }
-#line 1838 "yacc.tab.c"
+#line 1836 "yacc.tab.c"
     break;
 
   case 32: /* value_list_value: '-' value_list_value  */
-#line 631 "yacc.y"
+#line 629 "yacc.y"
                 { 
             if(!(yyvsp[0].expr_val).is_array){
                 if((yyvsp[0].expr_val).is_real){
@@ -1853,22 +1851,22 @@ yyreduce:
                 }
             }
 		}
-#line 1857 "yacc.tab.c"
+#line 1855 "yacc.tab.c"
     break;
 
   case 33: /* value_list_value: LPAREN value_list_value RPAREN  */
-#line 646 "yacc.y"
+#line 644 "yacc.y"
                 { 
 			if((yyvsp[-1].expr_val).is_real)
 				(yyval.expr_val).value.realNum = (yyvsp[-1].expr_val).value.realNum;
 			else
 				(yyval.expr_val).value.intNum = (yyvsp[-1].expr_val).value.intNum;
 		}
-#line 1868 "yacc.tab.c"
+#line 1866 "yacc.tab.c"
     break;
 
 
-#line 1872 "yacc.tab.c"
+#line 1870 "yacc.tab.c"
 
       default: break;
     }
@@ -2061,7 +2059,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 653 "yacc.y"
+#line 651 "yacc.y"
 
 
 void yyerror(const char *s) {

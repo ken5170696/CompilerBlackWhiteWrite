@@ -1,5 +1,5 @@
-// -9931
-// -10067
+// 3
+// 1
 #include <stdio.h>
 
 int main() {
@@ -10,12 +10,14 @@ int main() {
 	float arrMulResult = 27.799999;
 	float arrDivResult = 2.166667;
 	int i;
-	i = 68;
-	float j = -9999.232422;
-	int resultAdd = -9931;
-	int resultMin = -10067;
-	printf("-9931\n");
-	printf("-10067\n");
+	i = 1;
+	float j = 2.000000;
+	int k = 3;
+	int resultAdd = 3;
+	int resultMin = 1;
+	float complexMath = 2.000000;
+	printf("3\n");
+	printf("1\n");
 
 	return 0;
 }

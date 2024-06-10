@@ -81,7 +81,8 @@ extern int yydebug;
     COMMA = 282,                   /* COMMA  */
     ASSIGN = 283,                  /* ASSIGN  */
     COLON = 284,                   /* COLON  */
-    UMINUS = 285                   /* UMINUS  */
+    UMINUS = 285,                  /* UMINUS  */
+    PAREN = 286                    /* PAREN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -114,7 +115,7 @@ union YYSTYPE
         var_type varType;
     } type_val;
 
-#line 118 "yacc.tab.h"
+#line 119 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

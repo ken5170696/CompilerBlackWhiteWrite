@@ -6,12 +6,14 @@ fun main () {
 	var arrMulResult: real = arriVal * arrfVal;
 	var arrDivResult: real = arriVal / arrfVal;
 	var i: int; /// sfdsdf /* 
-	i = 68.235; 
-	var j: real = -9999.2323;
+	i = 1; 
+	var j: real = 2;
+	var k: int = 3;
 	var resultAdd: int = j + i;
 	var resultMin: int = j - i;
 	/* var resultMul: int = j * i;
 	var resultDiv: real = j / i; */
+	var complexMath: real = i + j * k - (5);
 	println( resultAdd );
 	println( resultMin );
 	// println( resultMul );

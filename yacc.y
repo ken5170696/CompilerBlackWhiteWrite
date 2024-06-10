@@ -71,6 +71,7 @@ variable *lookup_variable(char *name) {
 %left '+' '-'
 %left '*' '/'
 %nonassoc UMINUS
+%nonassoc PAREN
 
 %%
 
@@ -581,12 +582,9 @@ expr:
                 $$.is_array = $2.is_array;
             }
 		}
-    | LPAREN expr RPAREN          
-		{ 
-			if($2.is_real)
-				$$.value.realNum = $2.value.realNum;
-			else
-				$$.value.intNum = $2.value.intNum;
+    | LPAREN expr RPAREN %prec PAREN
+		{
+            $$ = $2; 
 		}
     | LBRACE value_list RBRACE {
         $$ = $2; 
