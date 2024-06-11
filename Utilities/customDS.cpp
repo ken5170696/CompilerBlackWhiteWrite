@@ -13,11 +13,11 @@ char* getArrayString(int* intArray, int len) {
     int newLen = 5;
     for(int i = 0; i < len; i++){
         int numLen = snprintf( NULL, 0, "%d", intArray[i] );
-        char* numStr = (char*)malloc(numLen);
+        char* numStr = (char*)malloc(numLen + 1);
         sprintf( numStr, "%d", intArray[i] );
         
         newLen = newLen + 3 + numLen;
-        returnStr = (char*)(realloc(returnStr, newLen));
+        returnStr = (char*)(realloc(returnStr, newLen+3));
         strcat(returnStr, numStr);
 
         if(i == len - 1)
@@ -33,7 +33,7 @@ char* getArrayString(float* floatArray, int len){
     int newLen = 5;
     for(int i = 0; i < len; i++){
         int numLen = snprintf( NULL, 0, "%f", floatArray[i] );
-        char* numStr = (char*)malloc(numLen);
+        char* numStr = (char*)malloc(numLen + 3);
         sprintf( numStr, "%f", floatArray[i] );
         
         newLen = newLen + 3 + numLen;

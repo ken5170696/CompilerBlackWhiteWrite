@@ -165,7 +165,6 @@ variable_declaration:
                     yyerror("ERROR: Array out of bounds."); 
                     YYABORT; 
                 }
-
                 if (var.type == INT_ARRAY_TYPE) {
                     var.value.intArr = (int *)malloc(sizeof(int) * var.arrayLength);
                     for(int i = 0; i < $6.arrayLength; i++){
@@ -175,19 +174,17 @@ variable_declaration:
                     char* returnStr = getArrayString(var.value.intArr, var.arrayLength);
                     // Return string
                     int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 19 + sizeof(returnStr));
+                    $$ = (char*)malloc(length + strlen(var.name) + 19 + strlen(returnStr));
                     sprintf($$, "int %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
                 } else if (var.type == REAL_ARRAY_TYPE) {
-
                     var.value.realArr = (float *)malloc(sizeof(float) * var.arrayLength);
                     for(int i = 0; i < $6.arrayLength; i++){
                         var.value.realArr[i] = $6.value.arrayNum[i];
                     }
-
                     char* returnStr = getArrayString(var.value.realArr, var.arrayLength);
                     // Return string
                     int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 21 + sizeof(returnStr));
+                    $$ = (char*)malloc(length + strlen(var.name) + 21 + strlen(returnStr));
                     sprintf($$, "float %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
                 }
             }else {
@@ -407,6 +404,11 @@ expr:
             }
 
 			if(isAllArray == 2) {
+                
+                if($1.arrayLength != $3.arrayLength){
+                    yyerror("ERROR: mismatched dimensions"); 
+                    YYABORT; 
+                }
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
                 $$.value.arrayNum = (float *)(malloc((maxLen) * sizeof(float)));
                 
@@ -444,6 +446,11 @@ expr:
             }
 
 			if(isAllArray == 2) {
+                
+                if($1.arrayLength != $3.arrayLength){
+                    yyerror("ERROR: mismatched dimensions"); 
+                    YYABORT; 
+                }
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
                 $$.value.arrayNum = (float *)(malloc((maxLen) * sizeof(float)));
@@ -483,6 +490,13 @@ expr:
             }
 
 			if(isAllArray == 2) {
+
+                
+                if($1.arrayLength != $3.arrayLength){
+                    yyerror("ERROR: mismatched dimensions"); 
+                    YYABORT; 
+                }
+
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
 
@@ -526,6 +540,11 @@ expr:
             }
 
 			if(isAllArray == 2) {
+                
+                if($1.arrayLength != $3.arrayLength){
+                    yyerror("ERROR: mismatched dimensions"); 
+                    YYABORT; 
+                }
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
 
@@ -596,7 +615,7 @@ value:
         $$.type = INT_TYPE;
     } 
     | STRING_CONST               {  
-        $$.value.str = (char *)malloc(sizeof($1));
+        $$.value.str = (char *)malloc(strlen($1));
         strcpy($$.value.str,($1 + 1)); 
         $$.value.str[strlen($$.value.str) - 1] = '\0';
         $$.type = STRING_TYPE;
