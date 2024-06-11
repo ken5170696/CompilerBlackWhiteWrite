@@ -45,4 +45,11 @@ typedef struct {
 bool is_var_type_array(var_type type);
 bool is_var_type_real(var_type type);
 
+char* getArrayString(int*, int len);
+char* getArrayString(float*, int len);
+char* getArrayString(char*);
+
+variable exprValToVariable(exprVal expr);
+exprVal variableToExprVal(variable var);
+
 #endif

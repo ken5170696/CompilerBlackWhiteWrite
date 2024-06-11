@@ -167,59 +167,28 @@ variable_declaration:
                 }
 
                 if (var.type == INT_ARRAY_TYPE) {
-                    
                     var.value.intArr = (int *)malloc(sizeof(int) * var.arrayLength);
                     for(int i = 0; i < $6.arrayLength; i++){
                         var.value.intArr[i] = $6.value.arrayNum[i];
                     }
 
-                    char* returnStr = (char*)malloc(5); // "{}\n"
-                    strcpy(returnStr, "{");
-                    int newLen = 5;
-                    for(int i = 0; i < $6.arrayLength; i++){
-                        int numLen = snprintf( NULL, 0, "%d", var.value.intArr[i] );
-                        char* numStr = (char*)malloc(numLen);
-                        sprintf( numStr, "%d", var.value.intArr[i] );
-                        
-                        newLen = newLen + 3 + numLen;
-                        returnStr = (char*)(realloc(returnStr, newLen));
-                        strcat(returnStr, numStr);
-                        if(i == $6.arrayLength - 1)
-                            break;
-                        strcat(returnStr, ", ");
-                    }
-                    strcat(returnStr, "};\n");
+                    char* returnStr = getArrayString(var.value.intArr, var.arrayLength);
                     // Return string
                     int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 16 + sizeof(returnStr));
-                    sprintf($$, "int %s[%d] = %s", var.name, $4.arrayLength, returnStr);
+                    $$ = (char*)malloc(length + strlen(var.name) + 19 + sizeof(returnStr));
+                    sprintf($$, "int %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
                 } else if (var.type == REAL_ARRAY_TYPE) {
+
                     var.value.realArr = (float *)malloc(sizeof(float) * var.arrayLength);
                     for(int i = 0; i < $6.arrayLength; i++){
                         var.value.realArr[i] = $6.value.arrayNum[i];
                     }
 
-
-                    char* returnStr = (char*)malloc(5); // "{}\n"
-                    strcpy(returnStr, "{");
-                    int newLen = 5;
-                    for(int i = 0; i < $6.arrayLength; i++){
-                        int numLen = snprintf( NULL, 0, "%f", var.value.realArr[i] );
-                        char* numStr = (char*)malloc(numLen);
-                        sprintf( numStr, "%f", var.value.realArr[i] );
-                        
-                        newLen = newLen + 3 + numLen;
-                        returnStr = (char*)(realloc(returnStr, newLen));
-                        strcat(returnStr, numStr);
-                        if(i == $6.arrayLength - 1)
-                            break;
-                        strcat(returnStr, ", ");
-                    }
-                    strcat(returnStr, "};\n");
+                    char* returnStr = getArrayString(var.value.realArr, var.arrayLength);
                     // Return string
                     int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 18 + sizeof(returnStr));
-                    sprintf($$, "float %s[%d] = %s", var.name, $4.arrayLength, returnStr);
+                    $$ = (char*)malloc(length + strlen(var.name) + 21 + sizeof(returnStr));
+                    sprintf($$, "float %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
                 }
             }else {
                 if (var.type == INT_TYPE) {
@@ -265,14 +234,28 @@ assignment:
                     yyerror("Array out of bounds."); 
                     YYABORT; 
                 }
-
-                // handle array's info
-                for(int i = 0; i < $3.arrayLength; i++){
-                    if (var->type == INT_ARRAY_TYPE) {
+                
+                if (var->type == INT_ARRAY_TYPE) {
+                    var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
+                    for(int i = 0; i < $3.arrayLength; i++){
                         var->value.intArr[i] = $3.value.arrayNum[i];
-                    } else if (var->type == REAL_ARRAY_TYPE) {
+                    }
+
+                    char* returnStr = getArrayString(var->value.intArr, var->arrayLength);
+                    // Return string
+                    $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                    sprintf($$, "%s = %s;\n", var->name, returnStr);
+                } else if (var->type == REAL_ARRAY_TYPE) {
+
+                    var->value.realArr = (float *)malloc(sizeof(float) * var->arrayLength);
+                    for(int i = 0; i < $3.arrayLength; i++){
                         var->value.realArr[i] = $3.value.arrayNum[i];
                     }
+
+                    char* returnStr = getArrayString(var->value.realArr, var->arrayLength);
+                    // Return string
+                    $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                    sprintf($$, "%s = %s;\n", var->name, returnStr);
                 }
             }else {
                 if((var->type == INT_ARRAY_TYPE || var->type == REAL_ARRAY_TYPE)) {
@@ -307,41 +290,67 @@ assignment:
 print_statement:
     PRINT LPAREN expr RPAREN SEMICOLON 		{ 
 
-        if(is_var_type_array($3.type)){
-            yyerror("Array cannot be print out"); 
-            YYABORT; 
-        }
+        
 
-    	if(is_var_type_real($3.type)){
-    		printf("// %f\n", $3.value.realNum); 
-            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
-            $$ = (char*)malloc(length + 18);
-            sprintf($$, "printf(\"%f\");\n", $3.value.realNum);
-        }
-    	else{
-    		printf("// %d\n", $3.value.intNum);
+    	if($3.type == INT_TYPE){
             int length = snprintf( NULL, 0, "%d", $3.value.intNum );
             $$ = (char*)malloc(length + 18);
             sprintf($$, "printf(\"%d\");\n", $3.value.intNum);
         }
+    	else if($3.type == REAL_TYPE){ 
+            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
+            $$ = (char*)malloc(length + 18);
+            sprintf($$, "printf(\"%f\");\n", $3.value.realNum);
+        } else if(is_var_type_array($3.type)){
+            char* arrayStr;
+            switch($3.type){
+            case INT_ARRAY_TYPE:
+                arrayStr = getArrayString($3.value.arrayNum, $3.arrayLength);
+                break; 
+            case REAL_ARRAY_TYPE:
+                arrayStr = getArrayString($3.value.arrayNum, $3.arrayLength);
+                break; 
+            case STRING_TYPE:
+                arrayStr = getArrayString($3.value.str);
+                break; 
+            }
+
+            int length = snprintf( NULL, 0, "printf(\"%s\");\n", arrayStr );
+            $$ = (char*)malloc(length);
+            sprintf($$, "printf(\"%s\");\n", arrayStr );
+        }
+        
 
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON	{ 
-        if(is_var_type_array($3.type)){
-            yyerror("Array cannot be print out"); 
-            YYABORT; 
-        }
-    	if(is_var_type_real($3.type)){
-    		printf("// %f\n", $3.value.realNum); 
+        
+    
+    	if($3.type == REAL_TYPE){
             int length = snprintf( NULL, 0, "%f", $3.value.realNum );
             $$ = (char*)malloc(length + 22);
             sprintf($$, "printf(\"%f\\n\");\n", $3.value.realNum);
         }
-    	else{
-    		printf("// %d\n", $3.value.intNum);
+    	else if($3.type == INT_TYPE){
             int length = snprintf( NULL, 0, "%d", $3.value.intNum );
             $$ = (char*)malloc(length + 22);
             sprintf($$, "printf(\"%d\\n\");\n", $3.value.intNum);
+        } else if(is_var_type_array($3.type)){
+            char* arrayStr;
+            switch($3.type){
+            case INT_ARRAY_TYPE:
+                arrayStr = getArrayString($3.value.arrayNum, $3.arrayLength);
+                break; 
+            case REAL_ARRAY_TYPE:
+                arrayStr = getArrayString($3.value.arrayNum, $3.arrayLength);
+                break; 
+            case STRING_TYPE:
+                arrayStr = getArrayString($3.value.str);
+                break; 
+            }
+
+            int length = snprintf( NULL, 0, "printf(\"%s\\n\");\n", arrayStr );
+            $$ = (char*)malloc(length);
+            sprintf($$, "printf(\"%s\\n\");\n", arrayStr );
         }
     }
 ;
@@ -582,7 +591,9 @@ value:
         $$.type = INT_TYPE;
     } 
     | STRING_CONST               {  
-        $$.value.intNum = 0;  
+        $$.value.str = (char *)malloc(sizeof($1));
+        strcpy($$.value.str,($1 + 1)); 
+        $$.value.str[strlen($$.value.str) - 1] = '\0';
         $$.type = STRING_TYPE;
     } 
     ;
@@ -594,14 +605,14 @@ value_list:
             $$.value.arrayNum = fPtr;
             $$.value.arrayNum[len - 1] = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
             $$.arrayLength = len;
-            $$.type = $3.type;
+            $$.type = is_var_type_real($3.type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
         }
     | value_list_value {
             $$.value.arrayNum = (float *)malloc(sizeof(float));
             
             $$.value.arrayNum[0] = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
             $$.arrayLength = 1;
-            $$.type = $1.type;
+            $$.type = is_var_type_real($1.type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
         }
     ;
 
