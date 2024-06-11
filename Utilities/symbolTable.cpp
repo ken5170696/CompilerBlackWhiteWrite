@@ -14,13 +14,11 @@ char* generateTabByScopeTab(int depth){
 int get_scope_count() {
     return scope_stack.size();
 }
-
 void push_scope() {
     SymbolTable *new_table = (SymbolTable *)malloc(sizeof(SymbolTable));
     new_table->head = NULL;
     scope_stack.push_back(new_table);
 }
-
 void pop_scope() {
     if (!scope_stack.empty()) {
         SymbolTable *top_table = scope_stack.back();
@@ -29,6 +27,11 @@ void pop_scope() {
     }
 }
 
+SymbolTable* get_current_table(){
+    vector<SymbolTable*> temp_stack = scope_stack;
+    SymbolTable *current_table = temp_stack.back();
+    return current_table;
+}
 void insert_variable(variable var) {
     if (scope_stack.empty()) {
         push_scope();
@@ -39,7 +42,6 @@ void insert_variable(variable var) {
     new_node->next = current_table->head;
     current_table->head = new_node;
 }
-
 variable *lookup_variable_with_scope(SymbolTable *current_table, char *name) {
     if(!current_table) return NULL;
     vector<SymbolTable*> temp_stack = scope_stack;
@@ -51,11 +53,6 @@ variable *lookup_variable_with_scope(SymbolTable *current_table, char *name) {
         current_node = current_node->next;
     }
     return NULL;
-}
-SymbolTable* get_current_table(){
-    vector<SymbolTable*> temp_stack = scope_stack;
-    SymbolTable *current_table = temp_stack.back();
-    return current_table;
 }
 variable *lookup_variable(char *name) {
     

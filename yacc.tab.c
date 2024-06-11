@@ -1275,7 +1275,7 @@ yyreduce:
         var.type = (yyvsp[-1].type_val).varType;
         var.arrayLength = (yyvsp[-1].type_val).arrayLength;
         if (lookup_variable_with_scope(get_current_table(), (yyvsp[-3].str))) {
-            yyerror("Variable already declared"); 
+            yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
             insert_variable(var);
@@ -1316,18 +1316,18 @@ yyreduce:
         var.type = (yyvsp[-3].type_val).varType;
         var.arrayLength = (yyvsp[-3].type_val).arrayLength;
         if (lookup_variable_with_scope(get_current_table(), (yyvsp[-5].str))) {
-            yyerror("Variable already declared"); 
+            yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
             
             if((yyvsp[-1].expr_val).is_array){
                 if((var.type == INT_TYPE || var.type == REAL_TYPE)) {
-                    yyerror("You cannot asign a const to an array."); 
+                    yyerror("ERROR: You cannot asign a const to an array."); 
                     YYABORT; 
                 }
                 
                 if(var.arrayLength < (yyvsp[-1].expr_val).arrayLength) {
-                    yyerror("variable_declaration: Array out of bounds."); 
+                    yyerror("ERROR: Array out of bounds."); 
                     YYABORT; 
                 }
 
@@ -1556,7 +1556,7 @@ yyreduce:
                                         {
 								variable *var = lookup_variable_with_scope(get_current_table(), (yyvsp[0].str));
 								if (!var) {
-									yyerror("Variable not declared");
+									yyerror("ERROR: Variable not declared");
                                     yyerror((yyvsp[0].str)); 
                                     YYABORT; 
 								} else {
@@ -1594,7 +1594,7 @@ yyreduce:
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
             if(isAllArray == 1){
-                yyerror("expr type mismatch."); 
+                yyerror("ERROR: expr type mismatch."); 
                 YYABORT; 
             }
 
@@ -1635,7 +1635,7 @@ yyreduce:
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
             if(isAllArray == 1){
-                yyerror("expr type mismatch."); 
+                yyerror("ERROR: expr type mismatch."); 
                 YYABORT; 
             }
 
@@ -1678,7 +1678,7 @@ yyreduce:
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
             if(isAllArray == 1){
-                yyerror("expr type mismatch."); 
+                yyerror("ERROR: expr type mismatch."); 
                 YYABORT; 
             }
 
@@ -1726,7 +1726,7 @@ yyreduce:
             int isAllArray = (yyvsp[-2].expr_val).is_array + (yyvsp[0].expr_val).is_array;
 
             if(isAllArray == 1){
-                yyerror("expr type mismatch."); 
+                yyerror("ERROR: expr type mismatch."); 
                 YYABORT; 
             }
 

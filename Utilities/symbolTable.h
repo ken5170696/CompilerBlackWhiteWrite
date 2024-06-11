@@ -7,6 +7,7 @@
 
 #include "customDS.h"
 
+// symbol table structure
 typedef struct SymbolTableNode {
     variable var;
     struct SymbolTableNode *next;
@@ -16,13 +17,16 @@ typedef struct SymbolTable {
     SymbolTableNode *head;
 } SymbolTable;
 
+// str tab
 char* generateTabByScopeTab(int depth);
 
+// scoping 
 int get_scope_count();
-SymbolTable* get_current_table();
 void push_scope();
 void pop_scope();
 
+// symbol table  
+SymbolTable* get_current_table();
 void insert_variable(variable );
 variable *lookup_variable(char*);
 variable *lookup_variable_with_scope(SymbolTable*, char*);
