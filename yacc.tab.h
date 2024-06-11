@@ -57,32 +57,33 @@ extern int yydebug;
     INTEGER_CONST = 258,           /* INTEGER_CONST  */
     REAL_CONST = 259,              /* REAL_CONST  */
     IDENTIFIER = 260,              /* IDENTIFIER  */
-    FUN = 261,                     /* FUN  */
-    MAIN = 262,                    /* MAIN  */
-    VAR = 263,                     /* VAR  */
-    PRINT = 264,                   /* PRINT  */
-    PRINTLN = 265,                 /* PRINTLN  */
-    RET = 266,                     /* RET  */
-    IF = 267,                      /* IF  */
-    ELSE = 268,                    /* ELSE  */
-    WHILE = 269,                   /* WHILE  */
-    FOR = 270,                     /* FOR  */
-    TO = 271,                      /* TO  */
-    INT = 272,                     /* INT  */
-    REAL = 273,                    /* REAL  */
-    NEWLINE = 274,                 /* NEWLINE  */
-    LBRACE = 275,                  /* LBRACE  */
-    RBRACE = 276,                  /* RBRACE  */
-    LBRACKET = 277,                /* LBRACKET  */
-    RBRACKET = 278,                /* RBRACKET  */
-    LPAREN = 279,                  /* LPAREN  */
-    RPAREN = 280,                  /* RPAREN  */
-    SEMICOLON = 281,               /* SEMICOLON  */
-    COMMA = 282,                   /* COMMA  */
-    ASSIGN = 283,                  /* ASSIGN  */
-    COLON = 284,                   /* COLON  */
-    UMINUS = 285,                  /* UMINUS  */
-    PAREN = 286                    /* PAREN  */
+    STRING_CONST = 261,            /* STRING_CONST  */
+    FUN = 262,                     /* FUN  */
+    MAIN = 263,                    /* MAIN  */
+    VAR = 264,                     /* VAR  */
+    PRINT = 265,                   /* PRINT  */
+    PRINTLN = 266,                 /* PRINTLN  */
+    RET = 267,                     /* RET  */
+    IF = 268,                      /* IF  */
+    ELSE = 269,                    /* ELSE  */
+    WHILE = 270,                   /* WHILE  */
+    FOR = 271,                     /* FOR  */
+    TO = 272,                      /* TO  */
+    INT = 273,                     /* INT  */
+    REAL = 274,                    /* REAL  */
+    NEWLINE = 275,                 /* NEWLINE  */
+    LBRACE = 276,                  /* LBRACE  */
+    RBRACE = 277,                  /* RBRACE  */
+    LBRACKET = 278,                /* LBRACKET  */
+    RBRACKET = 279,                /* RBRACKET  */
+    LPAREN = 280,                  /* LPAREN  */
+    RPAREN = 281,                  /* RPAREN  */
+    SEMICOLON = 282,               /* SEMICOLON  */
+    COMMA = 283,                   /* COMMA  */
+    ASSIGN = 284,                  /* ASSIGN  */
+    COLON = 285,                   /* COLON  */
+    UMINUS = 286,                  /* UMINUS  */
+    PAREN = 287                    /* PAREN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,7 +102,7 @@ union YYSTYPE
     exprVal expr_val;
     typeVal type_val;
 
-#line 105 "yacc.tab.h"
+#line 106 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

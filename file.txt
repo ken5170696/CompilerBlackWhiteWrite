@@ -1,4 +1,11 @@
 fun main () {
+
+	{
+		var GG: int[5] = { 0, -1.2, 2, 3, 4 };
+		{
+			var GG: int[5] = { 0, -1.2, 2, 3, 4 };
+		}
+	}
 	var arriVal: int[5] = { 0, -1.2, 2, 3, 4 };
 	var arrfVal: real[5] = { -6, 1.2, 2, 3, 4 };
 	var arrAddResult: real[10] = arriVal + arrfVal;

@@ -23,11 +23,11 @@ extern int yyparse();
 
 %token <intNum>   	INTEGER_CONST
 %token <realNum> 	REAL_CONST
-%token <str> 		IDENTIFIER
+%token <str> 		IDENTIFIER STRING_CONST
 %token FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
 %token LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 
-%type <str> function statement_list statement variable_declaration assignment print_statement
+%type <str> mainfunction statement_list statement variable_declaration assignment print_statement block
 %type <expr_val> expr value value_list value_list_value
 %type <type_val> type
 
@@ -39,31 +39,55 @@ extern int yyparse();
 %%
 
 program:
-    function {
+    mainfunction {
             printf("#include <stdio.h>\n\n%s", $1);
         }
         ;
 ;
 
-function:
-    FUN MAIN LPAREN RPAREN LBRACE statement_list RBRACE{
-            $$ = (char*)malloc(strlen($6) + 52);
-            sprintf($$, "int main() {\n%s\n\treturn 0;\n}\n", $6);
-        }
+mainfunction:
+    FUN MAIN LPAREN RPAREN block {
+        $$ = (char*)malloc(strlen($5) + 52);
+        sprintf($$, "void main() %s" , $5);
+    }
 ;
+block: 
+    LBRACE { push_scope(); } statement_list RBRACE {
+        pop_scope(); 
+        int scopeCount = get_scope_count();
+        char* tabStr = generateTabByScopeTab(scopeCount);
 
+        $$ = (char*)malloc(strlen($3) + 7);
+        char* tempStr = (char*)malloc(strlen($3) + strlen(tabStr) * 2 + 1);
+        sprintf(tempStr, "%s", $3);
+
+
+        strcpy($$,"\n");
+        strcat($$, tabStr);
+        strcat($$, "{\n");
+        strcat($$, tempStr);
+        strcat($$, tabStr);
+        strcat($$,"}\n");
+    }
+;
 statement_list:
     statement_list statement{
-                    char* temp = (char*)malloc(strlen($1) + strlen($2) + 5);
-                    strcpy(temp, "\t");
+                    int scopeCount = get_scope_count();
+                    char* tabStr = generateTabByScopeTab(scopeCount);
+                    
+                    char* temp = (char*)malloc(strlen($1) + strlen($2) + strlen(tabStr) * 2 + 1);
+                    strcpy(temp, tabStr);
                     strcpy(temp, $1);
-                    strcat(temp, "\t");
+                    strcat(temp, tabStr);
                     strcat(temp, $2);
                     $$ = temp;
                 }
     | statement {
-                    char* temp = (char*)malloc(strlen($1) + 3);
-                    strcpy(temp, "\t");
+                    int scopeCount = get_scope_count();
+                    char* tabStr = generateTabByScopeTab(scopeCount);
+
+                    char* temp = (char*)malloc(strlen($1) + strlen(tabStr) + 3);
+                    strcpy(temp, tabStr);
                     strcat(temp, $1);
                     $$ = temp;
                 }
@@ -79,6 +103,9 @@ statement:
 	| print_statement {
             $$ = $1;
         }
+    | block {
+        $$ = $1;
+    }
 ;
 
 variable_declaration:
@@ -87,7 +114,7 @@ variable_declaration:
         strcpy(var.name, $2);
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable($2)) {
+        if (lookup_variable_with_scope(get_current_table(), $2)) {
             yyerror("Variable already declared"); 
             YYABORT; 
         } else {
@@ -123,7 +150,7 @@ variable_declaration:
         strcpy(var.name, $2);
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable($2)) {
+        if (lookup_variable_with_scope(get_current_table(), $2)) {
             yyerror("Variable already declared"); 
             YYABORT; 
         } else {
@@ -222,7 +249,7 @@ variable_declaration:
 
 assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
-        variable *var = lookup_variable($1);
+        variable *var = lookup_variable_with_scope(get_current_table(), $1);
         if (!var) {
             yyerror("Variable not declared"); 
             yyerror($1); 
@@ -329,7 +356,7 @@ type:
 expr:
       value                 { $$ = $1; }
     | IDENTIFIER			{
-								variable *var = lookup_variable($1);
+								variable *var = lookup_variable_with_scope(get_current_table(), $1);
 								if (!var) {
 									yyerror("Variable not declared");
                                     yyerror($1); 
@@ -359,7 +386,6 @@ expr:
                                             $$.value.arrayNum[i] = var->value.realArr[i];
 									}
 								}
-                                printVariableData(var);
 							}
     | expr '+' expr        
         {
@@ -565,7 +591,12 @@ value:
         $$.value.intNum = (float)$1;  
         $$.is_real = 0; 
         $$.is_array = 0;
-    }
+    } 
+    | STRING_CONST               {  
+        $$.value.intNum = 0;  
+        $$.is_real = 0; 
+        $$.is_array = 0;
+    } 
     ;
 
 value_list: 

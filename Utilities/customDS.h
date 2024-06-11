@@ -10,7 +10,7 @@
 
 using namespace std;
 
-typedef enum { INT_TYPE , REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE } var_type;
+typedef enum { INT_TYPE , REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE, STRING_TYPE } var_type;
 
 typedef struct {
     var_type type;
@@ -19,6 +19,7 @@ typedef struct {
         float rval;
         int* intArr;
         float* realArr;
+        char* str;
     } value;
     int arrayLength;
     char name[100];
@@ -32,6 +33,7 @@ typedef struct {
         int intNum;
         float realNum;
         float* arrayNum;
+        char* str;
     } value;
     int arrayLength;
 } exprVal;
