@@ -47,8 +47,8 @@ program:
 
 mainfunction:
     FUN MAIN LPAREN RPAREN block {
-        $$ = (char*)malloc(strlen($5) + 52);
-        sprintf($$, "void main() %s" , $5);
+        $$ = (char*)malloc(strlen($5) + 15);
+        sprintf($$, "int main() %s" , $5);
     }
 ;
 block: 

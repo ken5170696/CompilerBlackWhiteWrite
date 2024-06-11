@@ -1171,8 +1171,8 @@ yyreduce:
   case 3: /* mainfunction: FUN MAIN LPAREN RPAREN block  */
 #line 49 "yacc.y"
                                  {
-        (yyval.str) = (char*)malloc(strlen((yyvsp[0].str)) + 52);
-        sprintf((yyval.str), "void main() %s" , (yyvsp[0].str));
+        (yyval.str) = (char*)malloc(strlen((yyvsp[0].str)) + 15);
+        sprintf((yyval.str), "int main() %s" , (yyvsp[0].str));
     }
 #line 1178 "yacc.tab.c"
     break;
