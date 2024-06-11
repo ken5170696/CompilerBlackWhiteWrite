@@ -42,7 +42,7 @@ void insert_variable(variable var) {
     new_node->next = current_table->head;
     current_table->head = new_node;
 }
-variable *lookup_variable_with_scope(SymbolTable *current_table, char *name) {
+variable *lookup_variable_with_scope(SymbolTable *current_table, const char *name) {
     if(!current_table) return NULL;
     vector<SymbolTable*> temp_stack = scope_stack;
     SymbolTableNode *current_node = current_table->head;

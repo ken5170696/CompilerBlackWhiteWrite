@@ -42,6 +42,11 @@ typedef struct {
     var_type varType;
 } typeVal;
 
+
+typedef struct {
+    std::string str;
+}StringWrapper;
+
 bool is_var_type_array(var_type type);
 bool is_var_type_real(var_type type);
 

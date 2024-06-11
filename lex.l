@@ -34,10 +34,20 @@ expressions 	([-+*/])
 "for"           { return FOR; }
 "to"            { return TO; }
 
-{strLit}        { yylval.str = strdup(yytext); return STRING_CONST; }
+{strLit}        {
+    StringWrapper* temp = new StringWrapper();
+    temp->str = strdup(yytext);
+    yylval.cppStr = temp; 
+    return STRING_CONST; 
+}
 {integer}       { sscanf(yytext, "%d", &(yylval.intNum)); return INTEGER_CONST; }
 {real}         	{ sscanf(yytext, "%f", &(yylval.realNum)); return REAL_CONST; }
-{identifier}    { yylval.str = strdup(yytext); return IDENTIFIER; }
+{identifier}    { 
+    StringWrapper* temp = new StringWrapper();
+    temp->str = strdup(yytext);
+    yylval.cppStr = temp; 
+    return IDENTIFIER; 
+}
 {expressions}   { return yytext[0]; }
 
 "="             { return ASSIGN; }

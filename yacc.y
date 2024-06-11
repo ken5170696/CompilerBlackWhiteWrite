@@ -7,13 +7,12 @@ void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
 
-
 %}
 
 %union {
     int     intNum;
     float   realNum;
-    char* 	str;
+    StringWrapper* cppStr;
     variable var;
     var_type varType;
     exprVal expr_val;
@@ -23,11 +22,11 @@ extern int yyparse();
 
 %token <intNum>   	INTEGER_CONST
 %token <realNum> 	REAL_CONST
-%token <str> 		IDENTIFIER STRING_CONST
+%token <cppStr> 		IDENTIFIER STRING_CONST
 %token FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
 %token LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 
-%type <str> mainfunction statement_list statement variable_declaration assignment print_statement block
+%type <cppStr> mainfunction block statement_list statement print_statement variable_declaration assignment
 %type <expr_val> expr value value_list value_list_value
 %type <type_val> type
 
@@ -40,15 +39,17 @@ extern int yyparse();
 
 program:
     mainfunction {
-            printf("#include <stdio.h>\n\n%s", $1);
+            cout << "#include <stdio.h>\n\n" << $1->str << endl;
         }
         ;
 ;
 
 mainfunction:
     FUN MAIN LPAREN RPAREN block {
-        $$ = (char*)malloc(strlen($5) + 15);
-        sprintf($$, "int main() %s" , $5);
+        $$ = new StringWrapper();
+        string mainStr = "int main() ";
+
+        $$->str = mainStr + $5->str;
     }
 ;
 block: 
@@ -57,17 +58,14 @@ block:
         int scopeCount = get_scope_count();
         char* tabStr = generateTabByScopeTab(scopeCount);
 
-        $$ = (char*)malloc(strlen($3) + 7);
-        char* tempStr = (char*)malloc(strlen($3) + strlen(tabStr) * 2 + 1);
-        sprintf(tempStr, "%s", $3);
-
-
-        strcpy($$,"\n");
-        strcat($$, tabStr);
-        strcat($$, "{\n");
-        strcat($$, tempStr);
-        strcat($$, tabStr);
-        strcat($$,"}\n");
+        $$ = new StringWrapper();
+        string statement_listStr = $3->str;
+        $$->str += "\n";
+        $$->str += tabStr;
+        $$->str += "{\n";
+        $$->str += statement_listStr;
+        $$->str += tabStr;
+        $$->str += "}\n";
     }
 ;
 statement_list:
@@ -75,46 +73,49 @@ statement_list:
                     int scopeCount = get_scope_count();
                     char* tabStr = generateTabByScopeTab(scopeCount);
                     
-                    char* temp = (char*)malloc(strlen($1) + strlen($2) + strlen(tabStr) * 2 + 1);
-                    strcpy(temp, tabStr);
-                    strcpy(temp, $1);
-                    strcat(temp, tabStr);
-                    strcat(temp, $2);
-                    $$ = temp;
+                    $$ = new StringWrapper();
+                    $$->str += $1->str;
+                    $$->str += tabStr;
+                    $$->str += $2->str;
                 }
     | statement {
                     int scopeCount = get_scope_count();
                     char* tabStr = generateTabByScopeTab(scopeCount);
 
-                    char* temp = (char*)malloc(strlen($1) + strlen(tabStr) + 3);
-                    strcpy(temp, tabStr);
-                    strcat(temp, $1);
-                    $$ = temp;
+                    $$ = new StringWrapper();
+                    $$->str += tabStr;
+                    $$->str += $1->str;
                 }
 ;
 
 statement:
 	variable_declaration {
-            $$ = $1;
+            $$ = new StringWrapper();
+            $$->str = $1->str;
         }
     | assignment {
-            $$ = $1;
+            $$ = new StringWrapper();
+            $$->str = $1->str;
         }
 	| print_statement {
-            $$ = $1;
+            $$ = new StringWrapper();
+            $$->str = $1->str;
         }
     | block {
-        $$ = $1;
+            $$ = new StringWrapper();
+            $$->str = $1->str;
     }
 ;
 
 variable_declaration:
     VAR IDENTIFIER COLON type SEMICOLON {
+        $$ = new StringWrapper();
+
         variable var;
-        strcpy(var.name, $2);
+        strcpy(var.name, $2->str.c_str());
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable_with_scope(get_current_table(), $2)) {
+        if (lookup_variable_with_scope(get_current_table(), $2->str.c_str())) {
             yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
@@ -122,35 +123,40 @@ variable_declaration:
         }
 
         if($4.varType == INT_TYPE){
-            $$ = (char*)malloc(strlen(var.name) + 11);
-            sprintf($$, "int %s;\n", var.name);
+            stringstream ss;
+            ss << "int " << var.name << ";\n";
+            $$->str = ss.str();
         }else if($4.varType == REAL_TYPE){
-            $$ = (char*)malloc(strlen(var.name) + 13);
-            sprintf($$, "float %s;\n", var.name);
+            stringstream ss;
+            ss << "float " << var.name << ";\n";
+            $$->str = ss.str();
         }else if($4.varType == INT_ARRAY_TYPE){
             var.arrayLength = $4.arrayLength;
             var.value.intArr = (int *)malloc(sizeof(int) * var.arrayLength);
 
             // Return string
-            int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-            $$ = (char*)malloc(length + strlen(var.name) + 14);
-            sprintf($$, "int %s[%d];\n", var.name, $4.arrayLength);
+            stringstream ss;
+            ss << "int " << var.name << "[" << $4.arrayLength << "];\n";
+            $$->str = ss.str();
+
         }else if($4.varType == REAL_ARRAY_TYPE){
             var.arrayLength = $4.arrayLength;
             var.value.realArr = (float *)malloc(sizeof(float) * var.arrayLength);
             
             // Return string
-            int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-            $$ = (char*)malloc(length + strlen(var.name) + 16);
-            sprintf($$, "float %s[%d];\n", var.name, $4.arrayLength);
+            stringstream ss;
+            ss << "int " << var.name << "[" << $4.arrayLength << "];\n";
+            $$->str = ss.str();
         }
     }
     | VAR IDENTIFIER COLON type ASSIGN expr SEMICOLON {
+        $$ = new StringWrapper();
+
         variable var;
-        strcpy(var.name, $2);
+        strcpy(var.name, $2->str.c_str());
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable_with_scope(get_current_table(), $2)) {
+        if (lookup_variable_with_scope(get_current_table(), $2->str.c_str())) {
             yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
@@ -172,20 +178,24 @@ variable_declaration:
                     }
 
                     char* returnStr = getArrayString(var.value.intArr, var.arrayLength);
+
                     // Return string
-                    int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 19 + strlen(returnStr));
-                    sprintf($$, "int %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
-                } else if (var.type == REAL_ARRAY_TYPE) {
+                    stringstream ss;
+                    ss << "int " << var.name << "[" << $4.arrayLength << "] = " << returnStr << ";\n";
+                    $$->str = ss.str();
+                } 
+                else if (var.type == REAL_ARRAY_TYPE) {
                     var.value.realArr = (float *)malloc(sizeof(float) * var.arrayLength);
                     for(int i = 0; i < $6.arrayLength; i++){
                         var.value.realArr[i] = $6.value.arrayNum[i];
                     }
+
                     char* returnStr = getArrayString(var.value.realArr, var.arrayLength);
+
                     // Return string
-                    int length = snprintf( NULL, 0, "%d", $4.arrayLength );
-                    $$ = (char*)malloc(length + strlen(var.name) + 21 + strlen(returnStr));
-                    sprintf($$, "float %s[%d] = %s;\n", var.name, $4.arrayLength, returnStr);
+                    stringstream ss;
+                    ss << "float " << var.name << "[" << $4.arrayLength << "] = " << returnStr << ";\n";
+                    $$->str = ss.str();
                 }
             }else {
                 if (var.type == INT_TYPE) {
@@ -194,18 +204,21 @@ variable_declaration:
                     } else {
                         var.value.ival = $6.value.intNum;
                     }
-                    int length = snprintf( NULL, 0, "%d", var.value.ival );
-                    $$ = (char*)malloc(length + strlen(var.name) + 15);
-                    sprintf($$, "int %s = %d;\n", var.name, var.value.ival);
+
+                    // Return string
+                    stringstream ss;
+                    ss << "int " << var.name << " = "<<var.value.ival<<";\n";
+                    $$->str = ss.str();
                 } else if (var.type == REAL_TYPE) {
                     if (is_var_type_real($6.type)) {
                         var.value.rval = $6.value.realNum;
                     } else {
                         var.value.rval = $6.value.intNum;
                     }
-                    int length = snprintf( NULL, 0, "%f", var.value.rval );
-                    $$ = (char*)malloc(length + strlen(var.name) + 17);
-                    sprintf($$, "float %s = %f;\n", var.name, var.value.rval);
+                    // Return string
+                    stringstream ss;
+                    ss << "float " << var.name << " = "<<var.value.rval<<";\n";
+                    $$->str = ss.str();
                 }
             }
             insert_variable(var);
@@ -215,27 +228,27 @@ variable_declaration:
 
 assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
-        variable *var = lookup_variable_with_scope(get_current_table(), $1);
+        $$ = new StringWrapper();
+
+        variable *var = lookup_variable_with_scope(get_current_table(), $1->str.c_str());
         if (!var) {
             yyerror("Variable not declared"); 
-            yyerror($1); 
+            yyerror($1->str.c_str()); 
             YYABORT; 
         } else {
             if(is_var_type_array($3.type)){
-                if(is_var_type_array($3.type)) {
-                    yyerror("Error: assigning to an array from an initializer list"); 
-                    YYABORT; 
-                }
+                yyerror("Error: assigning to an array from an initializer list"); 
+                YYABORT; 
 
-                if((var->type == INT_TYPE || var->type == REAL_TYPE)) {
-                    yyerror("Error: You cannot asign a const to an array."); 
-                    YYABORT; 
-                }
+                // if((var->type == INT_TYPE || var->type == REAL_TYPE)) {
+                //     yyerror("Error: You cannot asign a const to an array."); 
+                //     YYABORT; 
+                // }
                 
-                if(var->arrayLength < $3.arrayLength) {
-                    yyerror("Error: Array out of bounds."); 
-                    YYABORT; 
-                }
+                // if(var->arrayLength < $3.arrayLength) {
+                //     yyerror("Error: Array out of bounds."); 
+                //     YYABORT; 
+                // }
 
                 // if (var->type == INT_ARRAY_TYPE) {
                 //     var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
@@ -271,18 +284,20 @@ assignment:
                     } else {
                         var->value.ival = $3.value.intNum;
                     }
-                    int length = snprintf( NULL, 0, "%d", var->value.ival );
-                    $$ = (char*)malloc(length + strlen(var->name) + 11);
-                    sprintf($$, "%s = %d;\n", var->name, var->value.ival);
+                    stringstream ss;
+                    ss << var->name << " = " << var->value.ival << ";\n";
+                    $$->str = ss.str();
+
                 } else if (var->type == REAL_TYPE) {
                     if (is_var_type_real($3.type)) {
                         var->value.rval = $3.value.realNum;
                     } else {
                         var->value.rval = $3.value.intNum;
                     }
-                    int length = snprintf( NULL, 0, "%f", var->value.rval );
-                    $$ = (char*)malloc(length + strlen(var->name) + 11);
-                    sprintf($$, "%s = %f;\n", var->name, var->value.rval);
+
+                    stringstream ss;
+                    ss << var->name << " = " << var->value.rval << ";\n";
+                    $$->str = ss.str();
                 }
             }
         }
@@ -291,19 +306,19 @@ assignment:
 
 print_statement:
     PRINT LPAREN expr RPAREN SEMICOLON 		{ 
-
-        
+        $$ = new StringWrapper();
 
     	if($3.type == INT_TYPE){
-            int length = snprintf( NULL, 0, "%d", $3.value.intNum );
-            $$ = (char*)malloc(length + 18);
-            sprintf($$, "printf(\"%d\");\n", $3.value.intNum);
+            stringstream ss;
+            ss << "printf(\"" << $3.value.intNum << "\");\n";
+            $$->str = ss.str();
         }
     	else if($3.type == REAL_TYPE){ 
-            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
-            $$ = (char*)malloc(length + 18);
-            sprintf($$, "printf(\"%f\");\n", $3.value.realNum);
-        } else if(is_var_type_array($3.type)){
+            stringstream ss;
+            ss << "printf(\"" << $3.value.realNum << "\");\n";
+            $$->str = ss.str();
+        } 
+        else if(is_var_type_array($3.type)){
             char* arrayStr;
             switch($3.type){
             case INT_ARRAY_TYPE:
@@ -316,27 +331,26 @@ print_statement:
                 arrayStr = getArrayString($3.value.str);
                 break; 
             }
-
-            int length = snprintf( NULL, 0, "printf(\"%s\");\n", arrayStr );
-            $$ = (char*)malloc(length);
-            sprintf($$, "printf(\"%s\");\n", arrayStr );
+            
+            stringstream ss;
+            ss << "printf(\"" << arrayStr << "\");\n";
+            $$->str = ss.str();
         }
-        
-
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON	{ 
-        
-    
-    	if($3.type == REAL_TYPE){
-            int length = snprintf( NULL, 0, "%f", $3.value.realNum );
-            $$ = (char*)malloc(length + 22);
-            sprintf($$, "printf(\"%f\\n\");\n", $3.value.realNum);
+        $$ = new StringWrapper();
+
+    	if($3.type == INT_TYPE){
+            stringstream ss;
+            ss << "printf(\"" << $3.value.intNum << "\\n\");\n";
+            $$->str = ss.str();
         }
-    	else if($3.type == INT_TYPE){
-            int length = snprintf( NULL, 0, "%d", $3.value.intNum );
-            $$ = (char*)malloc(length + 22);
-            sprintf($$, "printf(\"%d\\n\");\n", $3.value.intNum);
-        } else if(is_var_type_array($3.type)){
+    	else if($3.type == REAL_TYPE){ 
+            stringstream ss;
+            ss << "printf(\"" << $3.value.realNum << "\\n\");\n";
+            $$->str = ss.str();
+        } 
+        else if(is_var_type_array($3.type)){
             char* arrayStr;
             switch($3.type){
             case INT_ARRAY_TYPE:
@@ -349,10 +363,10 @@ print_statement:
                 arrayStr = getArrayString($3.value.str);
                 break; 
             }
-
-            int length = snprintf( NULL, 0, "printf(\"%s\\n\");\n", arrayStr );
-            $$ = (char*)malloc(length);
-            sprintf($$, "printf(\"%s\\n\");\n", arrayStr );
+            
+            stringstream ss;
+            ss << "printf(\"" << arrayStr << "\\n\");\n";
+            $$->str = ss.str();
         }
     }
 ;
@@ -367,10 +381,10 @@ type:
 expr:
       value                 { $$ = $1; }
     | IDENTIFIER			{
-								variable *var = lookup_variable_with_scope(get_current_table(), $1);
+								variable *var = lookup_variable_with_scope(get_current_table(), $1->str.c_str());
 								if (!var) {
 									yyerror("ERROR: Variable not declared");
-                                    yyerror($1); 
+                                    yyerror($1->str.c_str()); 
                                     YYABORT; 
 								} else {
 									if (var->type == INT_TYPE) {
@@ -615,9 +629,10 @@ value:
         $$.type = INT_TYPE;
     } 
     | STRING_CONST               {  
-        $$.value.str = (char *)malloc(strlen($1));
-        strcpy($$.value.str,($1 + 1)); 
+        $$.value.str = (char *)malloc(strlen($1->str.c_str()));
+        strcpy($$.value.str,($1->str.c_str() + 1)); 
         $$.value.str[strlen($$.value.str) - 1] = '\0';
+        
         $$.type = STRING_TYPE;
     } 
     ;

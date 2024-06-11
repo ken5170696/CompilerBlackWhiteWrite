@@ -92,11 +92,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 13 "yacc.y"
+#line 12 "yacc.y"
 
     int     intNum;
     float   realNum;
-    char* 	str;
+    StringWrapper* cppStr;
     variable var;
     var_type varType;
     exprVal expr_val;
