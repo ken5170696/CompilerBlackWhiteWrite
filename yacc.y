@@ -155,7 +155,7 @@ variable_declaration:
             YYABORT; 
         } else {
             
-            if($6.is_array){
+            if(is_var_type_array($6.type)){
                 if((var.type == INT_TYPE || var.type == REAL_TYPE)) {
                     yyerror("ERROR: You cannot asign a const to an array."); 
                     YYABORT; 
@@ -223,7 +223,7 @@ variable_declaration:
                 }
             }else {
                 if (var.type == INT_TYPE) {
-                    if ($6.is_real) {
+                    if (is_var_type_real($6.type)) {
                         var.value.ival = $6.value.realNum;
                     } else {
                         var.value.ival = $6.value.intNum;
@@ -232,7 +232,7 @@ variable_declaration:
                     $$ = (char*)malloc(length + strlen(var.name) + 15);
                     sprintf($$, "int %s = %d;\n", var.name, var.value.ival);
                 } else if (var.type == REAL_TYPE) {
-                    if ($6.is_real) {
+                    if (is_var_type_real($6.type)) {
                         var.value.rval = $6.value.realNum;
                     } else {
                         var.value.rval = $6.value.intNum;
@@ -255,7 +255,7 @@ assignment:
             yyerror($1); 
             YYABORT; 
         } else {
-            if($3.is_array){
+            if(is_var_type_array($3.type)){
                 if((var->type == INT_TYPE || var->type == REAL_TYPE)) {
                     yyerror("You cannot asign a const to an array."); 
                     YYABORT; 
@@ -281,7 +281,7 @@ assignment:
                 }
 
                 if (var->type == INT_TYPE) {
-                    if ($3.is_real) {
+                    if (is_var_type_real($3.type)) {
                         var->value.ival = $3.value.realNum;
                     } else {
                         var->value.ival = $3.value.intNum;
@@ -290,7 +290,7 @@ assignment:
                     $$ = (char*)malloc(length + strlen(var->name) + 11);
                     sprintf($$, "%s = %d;\n", var->name, var->value.ival);
                 } else if (var->type == REAL_TYPE) {
-                    if ($3.is_real) {
+                    if (is_var_type_real($3.type)) {
                         var->value.rval = $3.value.realNum;
                     } else {
                         var->value.rval = $3.value.intNum;
@@ -307,12 +307,12 @@ assignment:
 print_statement:
     PRINT LPAREN expr RPAREN SEMICOLON 		{ 
 
-        if($3.is_array){
+        if(is_var_type_array($3.type)){
             yyerror("Array cannot be print out"); 
             YYABORT; 
         }
 
-    	if($3.is_real){
+    	if(is_var_type_real($3.type)){
     		printf("// %f\n", $3.value.realNum); 
             int length = snprintf( NULL, 0, "%f", $3.value.realNum );
             $$ = (char*)malloc(length + 18);
@@ -327,11 +327,11 @@ print_statement:
 
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON	{ 
-        if($3.is_array){
+        if(is_var_type_array($3.type)){
             yyerror("Array cannot be print out"); 
             YYABORT; 
         }
-    	if($3.is_real){
+    	if(is_var_type_real($3.type)){
     		printf("// %f\n", $3.value.realNum); 
             int length = snprintf( NULL, 0, "%f", $3.value.realNum );
             $$ = (char*)malloc(length + 22);
@@ -363,23 +363,19 @@ expr:
                                     YYABORT; 
 								} else {
 									if (var->type == INT_TYPE) {
-    									$$.is_real = 0;
-    									$$.is_array = 0;
+                                        $$.type = INT_TYPE;
 										$$.value.intNum = var->value.ival;
 									} else if (var->type == REAL_TYPE) {
-    									$$.is_real = 1;
-    									$$.is_array = 0;
+                                        $$.type = REAL_TYPE;
 										$$.value.realNum = var->value.rval;
 									} else if (var->type == INT_ARRAY_TYPE) {
-    									$$.is_real = 0;
-    									$$.is_array = 1;
+                                        $$.type = INT_ARRAY_TYPE;
                                         $$.arrayLength = var->arrayLength;
                                         $$.value.arrayNum = (float*)malloc(var->arrayLength * sizeof(float));
                                         for(int i = 0; i < $$.arrayLength; i++)
                                             $$.value.arrayNum[i] = var->value.intArr[i];
 									} else if (var->type == REAL_ARRAY_TYPE) {
-    									$$.is_real = 1;
-    									$$.is_array = 1;
+                                        $$.type = REAL_ARRAY_TYPE;
                                         $$.arrayLength = var->arrayLength;
                                         $$.value.arrayNum = (float*)malloc(var->arrayLength * sizeof(float));
                                         for(int i = 0; i < $$.arrayLength; i++)
@@ -389,7 +385,7 @@ expr:
 							}
     | expr '+' expr        
         {
-            int isAllArray = $1.is_array + $3.is_array;
+            int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
 
             if(isAllArray == 1){
                 yyerror("ERROR: expr type mismatch."); 
@@ -399,11 +395,11 @@ expr:
 			if(isAllArray == 2) {
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
                 $$.value.arrayNum = (float *)(malloc((maxLen) * sizeof(float)));
-                $$.is_array = 1;
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_ARRAY_TYPE;
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_ARRAY_TYPE;
                 }
 
                 for(int i = 0; i < maxLen; i++) {
@@ -412,21 +408,21 @@ expr:
                 }
 
             } else {
-                float v1 = $1.is_real ? $1.value.realNum : $1.value.intNum;
-                float v2 = $3.is_real ? $3.value.realNum : $3.value.intNum;
+                float v1 = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
+                float v2 = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
 
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_TYPE;
                     $$.value.realNum = (v1 + v2);
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_TYPE;
                     $$.value.intNum = (v1 + v2);
                 }
             }
         }
     | expr '-' expr        
         {
-            int isAllArray = $1.is_array + $3.is_array;
+            int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
 
             if(isAllArray == 1){
                 yyerror("ERROR: expr type mismatch."); 
@@ -437,11 +433,11 @@ expr:
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
                 $$.value.arrayNum = (float *)(malloc((maxLen) * sizeof(float)));
-                $$.is_array = 1;
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_ARRAY_TYPE;
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_ARRAY_TYPE;
                 }
 
                 for(int i = 0; i < maxLen; i++) {
@@ -451,21 +447,21 @@ expr:
 
             } else {
                 // Non vector math
-                float v1 = $1.is_real ? $1.value.realNum : $1.value.intNum;
-                float v2 = $3.is_real ? $3.value.realNum : $3.value.intNum;
+                float v1 = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
+                float v2 = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
 
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_TYPE;
                     $$.value.realNum = (v1 - v2);
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_TYPE;
                     $$.value.intNum = (v1 - v2);
                 }
             }
         }
     | expr '*' expr        
         {
-            int isAllArray = $1.is_array + $3.is_array;
+            int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
 
             if(isAllArray == 1){
                 yyerror("ERROR: expr type mismatch."); 
@@ -475,7 +471,6 @@ expr:
 			if(isAllArray == 2) {
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
-                $$.is_array = 0;
 
                 // vector * vector = number
                 float result = 0;
@@ -485,31 +480,31 @@ expr:
                     result += v1 * v2;
                 }
 
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_TYPE;
                     $$.value.realNum = result;
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_TYPE;
                     $$.value.intNum = result;
                 }
 
             } else {
                 // Non vector math
-                float v1 = $1.is_real ? $1.value.realNum : $1.value.intNum;
-                float v2 = $3.is_real ? $3.value.realNum : $3.value.intNum;
+                float v1 = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
+                float v2 = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
 
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_TYPE;
                     $$.value.realNum = (v1 * v2);
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_TYPE;
                     $$.value.intNum = (v1 * v2);
                 }
             }
         }
     | expr '/' expr         
         {
-            int isAllArray = $1.is_array + $3.is_array;
+            int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
 
             if(isAllArray == 1){
                 yyerror("ERROR: expr type mismatch."); 
@@ -519,7 +514,6 @@ expr:
 			if(isAllArray == 2) {
                 // vector math
                 int maxLen = MAX($1.arrayLength, $3.arrayLength);
-                $$.is_array = 0;
 
                 // vector * vector = number
                 float result = 0;
@@ -533,27 +527,27 @@ expr:
                     result += v1 / v2;
                 }
 
-                if($1.is_real || $3.is_real){
-                    $$.is_real = 1;
+                if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                    $$.type = REAL_TYPE;
                     $$.value.realNum = result;
                 }else{
-                    $$.is_real = 0;
+                    $$.type = INT_TYPE;
                     $$.value.intNum = result;
                 }
 
             } else {
-                float v1 = $1.is_real ? $1.value.realNum : $1.value.intNum;
-                float v2 = $3.is_real ? $3.value.realNum : $3.value.intNum;
+                float v1 = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
+                float v2 = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
                     
                 if (v2 == 0.0) { 
                     yyerror("Error: divisor cannot be zero!"); 
                     YYABORT; 
                 } else { 
-                    if($1.is_real || $3.is_real){
-                        $$.is_real = 1;
+                    if(is_var_type_real($1.type) || is_var_type_real($3.type)){
+                        $$.type = REAL_TYPE;
                         $$.value.realNum = (v1 / v2);
                     }else{
-                        $$.is_real = 0;
+                        $$.type = INT_TYPE;
                         $$.value.intNum = (v1 / v2);
                     }
                 } 
@@ -561,16 +555,13 @@ expr:
         }
     | '-' expr %prec UMINUS          
 		{ 
-			if($2.is_real && !$2.is_array){
+			if(is_var_type_real($2.type) && !is_var_type_array($2.type)){
 				$$.value.realNum = -$2.value.realNum;
-                $$.is_real = $2.is_real;
-                $$.is_array = $2.is_array;
             }
 			else{
 				$$.value.intNum = -$2.value.intNum;
-                $$.is_real = $2.is_real;
-                $$.is_array = $2.is_array;
             }
+            $$.type = $2.type;
 		}
     | LPAREN expr RPAREN %prec PAREN
 		{
@@ -584,18 +575,15 @@ expr:
 value:
       REAL_CONST                 { 
         $$.value.realNum = $1; 
-        $$.is_real = 1; 
-        $$.is_array = 0; 
+        $$.type = REAL_TYPE;
     }
     | INTEGER_CONST               { 
         $$.value.intNum = (float)$1;  
-        $$.is_real = 0; 
-        $$.is_array = 0;
+        $$.type = INT_TYPE;
     } 
     | STRING_CONST               {  
         $$.value.intNum = 0;  
-        $$.is_real = 0; 
-        $$.is_array = 0;
+        $$.type = STRING_TYPE;
     } 
     ;
 
@@ -604,16 +592,16 @@ value_list:
             const int len = $1.arrayLength + 1;
             float* fPtr = (float *)(realloc($1.value.arrayNum, (len) * sizeof(float)));
             $$.value.arrayNum = fPtr;
-            $$.value.arrayNum[len - 1] = $3.is_real ? $3.value.realNum : $3.value.intNum;
+            $$.value.arrayNum[len - 1] = is_var_type_real($3.type) ? $3.value.realNum : $3.value.intNum;
             $$.arrayLength = len;
-            $$.is_array = 1;
+            $$.type = $3.type;
         }
     | value_list_value {
             $$.value.arrayNum = (float *)malloc(sizeof(float));
             
-            $$.value.arrayNum[0] = $1.is_real ? $1.value.realNum : $1.value.intNum;
+            $$.value.arrayNum[0] = is_var_type_real($1.type) ? $1.value.realNum : $1.value.intNum;
             $$.arrayLength = 1;
-            $$.is_array = 1;
+            $$.type = $1.type;
         }
     ;
 
@@ -622,25 +610,23 @@ value_list_value:
       value                 { $$ = $1; }
     | '-' value_list_value %prec UMINUS          
 		{ 
-            if(!$2.is_array){
-                if($2.is_real){
+            if(!is_var_type_array($2.type)){
+                if(is_var_type_real($2.type)){
                     $$.value.realNum = -$2.value.realNum;
-                    $$.is_real = $2.is_real;
-                    $$.is_array = $2.is_array;
                 }
                 else{
                     $$.value.intNum = -$2.value.intNum;
-                    $$.is_real = $2.is_real;
-                    $$.is_array = $2.is_array;
                 }
+                $$.type = $2.type;
             }
 		}
     | LPAREN value_list_value RPAREN          
 		{ 
-			if($2.is_real)
+			if(is_var_type_real($2.type))
 				$$.value.realNum = $2.value.realNum;
 			else
 				$$.value.intNum = $2.value.intNum;
+            $$.type = $2.type;
 		}
     ;
 %%

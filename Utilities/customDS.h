@@ -27,8 +27,7 @@ typedef struct {
 
     
 typedef struct {
-    int is_real;
-    int is_array;
+    var_type type;
     union {
         int intNum;
         float realNum;
@@ -42,5 +41,8 @@ typedef struct {
     int arrayLength;
     var_type varType;
 } typeVal;
+
+bool is_var_type_array(var_type type);
+bool is_var_type_real(var_type type);
 
 #endif
