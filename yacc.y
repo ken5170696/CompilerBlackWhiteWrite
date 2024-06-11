@@ -388,13 +388,21 @@ type:
     | REAL { 
         $$.varType = REAL_TYPE; 
     }
-    | REAL LBRACKET INTEGER_CONST RBRACKET { 
+    | REAL LBRACKET expr RBRACKET { 
+        if($3.type != INT_TYPE){
+            yyerror("ERROR: array length is not INT_LIT");
+            YYABORT;
+        }
         $$.varType = REAL_ARRAY_TYPE; 
-        $$.arrayLength = $3; 
+        $$.arrayLength = $3.value.intNum; 
     }
-    | INT LBRACKET INTEGER_CONST RBRACKET { 
+    | INT LBRACKET expr RBRACKET { 
+        if($3.type != INT_TYPE){
+            yyerror("ERROR: array length is not INT_LIT");
+            YYABORT;
+        }
         $$.varType = INT_ARRAY_TYPE; 
-        $$.arrayLength = $3; 
+        $$.arrayLength = $3.value.intNum;
     }
 ;
 

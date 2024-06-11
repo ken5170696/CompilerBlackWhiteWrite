@@ -3,12 +3,11 @@
 
 int main() 
 {
-	float i = 1.5;
-	float j = 3.14;
-	float k = 2.8;
-	printf("%f",i + j * k);
+	float vi1[5] = {5.000000, 3.000000, 4.000000, 1.000000, 2.000000};
+	float vi2[5] = {2.000000, -2.000000, 4.000000, 0.000000, 0.000000};
+	printf("%f",dotArray( vi1 , vi2 , 5 , 5 ));
 	printf("\n");
-	printf("%f",i * ( j + k ));
+	printArray(addArray( vi1 , vi2 , 5 , 5 ), 5);
 	printf("\n");
 }
 
