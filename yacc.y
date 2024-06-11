@@ -6,7 +6,6 @@
 void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
-
 %}
 
 %union {
@@ -19,14 +18,13 @@ extern int yyparse();
     typeVal type_val;
 }
 
-
+%token              FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
+%token              LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 %token <intNum>   	INTEGER_CONST
 %token <realNum> 	REAL_CONST
 %token <cppStr> 	IDENTIFIER STRING_CONST
-%token              FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
-%token              LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 
-%type <cppStr>      mainfunction block statement_list statement print_statement variable_declaration assignment
+%type <cppStr>      function block statement_list statement print_statement variable_declaration assignment
 %type <expr_val>    expr value value_list value_list_value
 %type <type_val>    type
 
@@ -38,18 +36,25 @@ extern int yyparse();
 %%
 
 program:
-    mainfunction {
+    function {
         cout << "#include <stdio.h>\n\n" << $1->str << endl;
     }
-    ;
 ;
 
-mainfunction:
+function:
     FUN MAIN LPAREN RPAREN block {
         $$ = new StringWrapper();
         string mainStr = "int main() ";
 
         $$->str = mainStr + $5->str;
+    }
+    | FUN MAIN LPAREN RPAREN COLON type block {
+        int scopeCount = get_scope_count();
+        char* tabStr = generateTabByScopeTab(scopeCount);
+
+        $$ = new StringWrapper();
+        $$->str += tabStr;
+        $$->str += $1->str;
     }
 ;
 block: 
@@ -224,7 +229,7 @@ variable_declaration:
             insert_variable(var);
         }
     }
-    ;
+;
 
 assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
@@ -302,7 +307,7 @@ assignment:
             }
         }
     }
-    ;
+;
 
 print_statement:
     PRINT LPAREN expr RPAREN SEMICOLON 		{ 
@@ -623,7 +628,7 @@ expr:
     | LBRACE value_list RBRACE {
         $$ = $2; 
     }
-    ;
+;
 
 value:
     REAL_CONST { 
@@ -641,7 +646,7 @@ value:
         
         $$.type = STRING_TYPE;
     } 
-    ;
+;
 
 value_list: 
     value_list COMMA value_list_value {
@@ -659,7 +664,7 @@ value_list:
         $$.arrayLength = 1;
         $$.type = is_var_type_real($1.type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
     }
-    ;
+;
 
 
 value_list_value:
@@ -684,7 +689,7 @@ value_list_value:
             $$.value.intNum = $2.value.intNum;
         $$.type = $2.type;
     }
-    ;
+;
 %%
 
 void yyerror(const char *s) {
