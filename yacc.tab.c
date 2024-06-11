@@ -548,9 +548,9 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    42,    42,    49,    55,    55,    74,    85,    97,   100,
-     103,   106,   112,   148,   220,   291,   325,   359,   360,   361,
-     362,   366,   367,   395,   432,   471,   514,   565,   575,   579,
-     585,   589,   593,   602,   610,   621,   622,   634
+     103,   106,   112,   148,   220,   296,   330,   364,   365,   366,
+     367,   371,   372,   400,   437,   476,   519,   570,   580,   584,
+     590,   594,   598,   607,   615,   626,   627,   639
 };
 #endif
 
@@ -1392,38 +1392,43 @@ yyreduce:
             YYABORT; 
         } else {
             if(is_var_type_array((yyvsp[-1].expr_val).type)){
+                if(is_var_type_array((yyvsp[-1].expr_val).type)) {
+                    yyerror("Error: assigning to an array from an initializer list"); 
+                    YYABORT; 
+                }
+
                 if((var->type == INT_TYPE || var->type == REAL_TYPE)) {
-                    yyerror("You cannot asign a const to an array."); 
+                    yyerror("Error: You cannot asign a const to an array."); 
                     YYABORT; 
                 }
                 
                 if(var->arrayLength < (yyvsp[-1].expr_val).arrayLength) {
-                    yyerror("Array out of bounds."); 
+                    yyerror("Error: Array out of bounds."); 
                     YYABORT; 
                 }
-                
-                if (var->type == INT_ARRAY_TYPE) {
-                    var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
-                    for(int i = 0; i < (yyvsp[-1].expr_val).arrayLength; i++){
-                        var->value.intArr[i] = (yyvsp[-1].expr_val).value.arrayNum[i];
-                    }
 
-                    char* returnStr = getArrayString(var->value.intArr, var->arrayLength);
-                    // Return string
-                    (yyval.str) = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
-                    sprintf((yyval.str), "%s = %s;\n", var->name, returnStr);
-                } else if (var->type == REAL_ARRAY_TYPE) {
+                // if (var->type == INT_ARRAY_TYPE) {
+                //     var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
+                //     for(int i = 0; i < $3.arrayLength; i++){
+                //         var->value.intArr[i] = $3.value.arrayNum[i];
+                //     }
 
-                    var->value.realArr = (float *)malloc(sizeof(float) * var->arrayLength);
-                    for(int i = 0; i < (yyvsp[-1].expr_val).arrayLength; i++){
-                        var->value.realArr[i] = (yyvsp[-1].expr_val).value.arrayNum[i];
-                    }
+                //     char* returnStr = getArrayString(var->value.intArr, var->arrayLength);
+                //     // Return string
+                //     $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                //     sprintf($$, "%s = %s;\n", var->name, returnStr);
+                // } else if (var->type == REAL_ARRAY_TYPE) {
 
-                    char* returnStr = getArrayString(var->value.realArr, var->arrayLength);
-                    // Return string
-                    (yyval.str) = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
-                    sprintf((yyval.str), "%s = %s;\n", var->name, returnStr);
-                }
+                //     var->value.realArr = (float *)malloc(sizeof(float) * var->arrayLength);
+                //     for(int i = 0; i < $3.arrayLength; i++){
+                //         var->value.realArr[i] = $3.value.arrayNum[i];
+                //     }
+
+                //     char* returnStr = getArrayString(var->value.realArr, var->arrayLength);
+                //     // Return string
+                //     $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                //     sprintf($$, "%s = %s;\n", var->name, returnStr);
+                // }
             }else {
                 if((var->type == INT_ARRAY_TYPE || var->type == REAL_ARRAY_TYPE)) {
                     yyerror("You cannot asign an array to a const variable."); 
@@ -1452,11 +1457,11 @@ yyreduce:
             }
         }
     }
-#line 1456 "yacc.tab.c"
+#line 1461 "yacc.tab.c"
     break;
 
   case 15: /* print_statement: PRINT LPAREN expr RPAREN SEMICOLON  */
-#line 291 "yacc.y"
+#line 296 "yacc.y"
                                                 { 
 
         
@@ -1491,11 +1496,11 @@ yyreduce:
         
 
     }
-#line 1495 "yacc.tab.c"
+#line 1500 "yacc.tab.c"
     break;
 
   case 16: /* print_statement: PRINTLN LPAREN expr RPAREN SEMICOLON  */
-#line 325 "yacc.y"
+#line 330 "yacc.y"
                                                 { 
         
     
@@ -1527,41 +1532,41 @@ yyreduce:
             sprintf((yyval.str), "printf(\"%s\\n\");\n", arrayStr );
         }
     }
-#line 1531 "yacc.tab.c"
+#line 1536 "yacc.tab.c"
     break;
 
   case 17: /* type: INT  */
-#line 359 "yacc.y"
+#line 364 "yacc.y"
         { (yyval.type_val).varType = INT_TYPE; }
-#line 1537 "yacc.tab.c"
+#line 1542 "yacc.tab.c"
     break;
 
   case 18: /* type: REAL  */
-#line 360 "yacc.y"
+#line 365 "yacc.y"
            { (yyval.type_val).varType = REAL_TYPE; }
-#line 1543 "yacc.tab.c"
+#line 1548 "yacc.tab.c"
     break;
 
   case 19: /* type: REAL LBRACKET INTEGER_CONST RBRACKET  */
-#line 361 "yacc.y"
+#line 366 "yacc.y"
                                            { (yyval.type_val).varType = REAL_ARRAY_TYPE; (yyval.type_val).arrayLength = (yyvsp[-1].intNum); }
-#line 1549 "yacc.tab.c"
+#line 1554 "yacc.tab.c"
     break;
 
   case 20: /* type: INT LBRACKET INTEGER_CONST RBRACKET  */
-#line 362 "yacc.y"
+#line 367 "yacc.y"
                                           { (yyval.type_val).varType = INT_ARRAY_TYPE; (yyval.type_val).arrayLength = (yyvsp[-1].intNum); }
-#line 1555 "yacc.tab.c"
+#line 1560 "yacc.tab.c"
     break;
 
   case 21: /* expr: value  */
-#line 366 "yacc.y"
+#line 371 "yacc.y"
                             { (yyval.expr_val) = (yyvsp[0].expr_val); }
-#line 1561 "yacc.tab.c"
+#line 1566 "yacc.tab.c"
     break;
 
   case 22: /* expr: IDENTIFIER  */
-#line 367 "yacc.y"
+#line 372 "yacc.y"
                                         {
 								variable *var = lookup_variable_with_scope(get_current_table(), (yyvsp[0].str));
 								if (!var) {
@@ -1590,11 +1595,11 @@ yyreduce:
 									}
 								}
 							}
-#line 1594 "yacc.tab.c"
+#line 1599 "yacc.tab.c"
     break;
 
   case 23: /* expr: expr '+' expr  */
-#line 396 "yacc.y"
+#line 401 "yacc.y"
         {
             int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1631,11 +1636,11 @@ yyreduce:
                 }
             }
         }
-#line 1635 "yacc.tab.c"
+#line 1640 "yacc.tab.c"
     break;
 
   case 24: /* expr: expr '-' expr  */
-#line 433 "yacc.y"
+#line 438 "yacc.y"
         {
             int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1674,11 +1679,11 @@ yyreduce:
                 }
             }
         }
-#line 1678 "yacc.tab.c"
+#line 1683 "yacc.tab.c"
     break;
 
   case 25: /* expr: expr '*' expr  */
-#line 472 "yacc.y"
+#line 477 "yacc.y"
         {
             int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1721,11 +1726,11 @@ yyreduce:
                 }
             }
         }
-#line 1725 "yacc.tab.c"
+#line 1730 "yacc.tab.c"
     break;
 
   case 26: /* expr: expr '/' expr  */
-#line 515 "yacc.y"
+#line 520 "yacc.y"
         {
             int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1776,11 +1781,11 @@ yyreduce:
                 } 
             }
         }
-#line 1780 "yacc.tab.c"
+#line 1785 "yacc.tab.c"
     break;
 
   case 27: /* expr: '-' expr  */
-#line 566 "yacc.y"
+#line 571 "yacc.y"
                 { 
 			if(is_var_type_real((yyvsp[0].expr_val).type) && !is_var_type_array((yyvsp[0].expr_val).type)){
 				(yyval.expr_val).value.realNum = -(yyvsp[0].expr_val).value.realNum;
@@ -1790,56 +1795,56 @@ yyreduce:
             }
             (yyval.expr_val).type = (yyvsp[0].expr_val).type;
 		}
-#line 1794 "yacc.tab.c"
+#line 1799 "yacc.tab.c"
     break;
 
   case 28: /* expr: LPAREN expr RPAREN  */
-#line 576 "yacc.y"
+#line 581 "yacc.y"
                 {
             (yyval.expr_val) = (yyvsp[-1].expr_val); 
 		}
-#line 1802 "yacc.tab.c"
+#line 1807 "yacc.tab.c"
     break;
 
   case 29: /* expr: LBRACE value_list RBRACE  */
-#line 579 "yacc.y"
+#line 584 "yacc.y"
                                {
         (yyval.expr_val) = (yyvsp[-1].expr_val); 
     }
-#line 1810 "yacc.tab.c"
+#line 1815 "yacc.tab.c"
     break;
 
   case 30: /* value: REAL_CONST  */
-#line 585 "yacc.y"
+#line 590 "yacc.y"
                                  { 
         (yyval.expr_val).value.realNum = (yyvsp[0].realNum); 
         (yyval.expr_val).type = REAL_TYPE;
     }
-#line 1819 "yacc.tab.c"
+#line 1824 "yacc.tab.c"
     break;
 
   case 31: /* value: INTEGER_CONST  */
-#line 589 "yacc.y"
+#line 594 "yacc.y"
                                   { 
         (yyval.expr_val).value.intNum = (float)(yyvsp[0].intNum);  
         (yyval.expr_val).type = INT_TYPE;
     }
-#line 1828 "yacc.tab.c"
+#line 1833 "yacc.tab.c"
     break;
 
   case 32: /* value: STRING_CONST  */
-#line 593 "yacc.y"
+#line 598 "yacc.y"
                                  {  
         (yyval.expr_val).value.str = (char *)malloc(sizeof((yyvsp[0].str)));
         strcpy((yyval.expr_val).value.str,((yyvsp[0].str) + 1)); 
         (yyval.expr_val).value.str[strlen((yyval.expr_val).value.str) - 1] = '\0';
         (yyval.expr_val).type = STRING_TYPE;
     }
-#line 1839 "yacc.tab.c"
+#line 1844 "yacc.tab.c"
     break;
 
   case 33: /* value_list: value_list COMMA value_list_value  */
-#line 602 "yacc.y"
+#line 607 "yacc.y"
                                       {
             const int len = (yyvsp[-2].expr_val).arrayLength + 1;
             float* fPtr = (float *)(realloc((yyvsp[-2].expr_val).value.arrayNum, (len) * sizeof(float)));
@@ -1848,11 +1853,11 @@ yyreduce:
             (yyval.expr_val).arrayLength = len;
             (yyval.expr_val).type = is_var_type_real((yyvsp[0].expr_val).type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
         }
-#line 1852 "yacc.tab.c"
+#line 1857 "yacc.tab.c"
     break;
 
   case 34: /* value_list: value_list_value  */
-#line 610 "yacc.y"
+#line 615 "yacc.y"
                        {
             (yyval.expr_val).value.arrayNum = (float *)malloc(sizeof(float));
             
@@ -1860,17 +1865,17 @@ yyreduce:
             (yyval.expr_val).arrayLength = 1;
             (yyval.expr_val).type = is_var_type_real((yyvsp[0].expr_val).type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
         }
-#line 1864 "yacc.tab.c"
+#line 1869 "yacc.tab.c"
     break;
 
   case 35: /* value_list_value: value  */
-#line 621 "yacc.y"
+#line 626 "yacc.y"
                             { (yyval.expr_val) = (yyvsp[0].expr_val); }
-#line 1870 "yacc.tab.c"
+#line 1875 "yacc.tab.c"
     break;
 
   case 36: /* value_list_value: '-' value_list_value  */
-#line 623 "yacc.y"
+#line 628 "yacc.y"
                 { 
             if(!is_var_type_array((yyvsp[0].expr_val).type)){
                 if(is_var_type_real((yyvsp[0].expr_val).type)){
@@ -1882,11 +1887,11 @@ yyreduce:
                 (yyval.expr_val).type = (yyvsp[0].expr_val).type;
             }
 		}
-#line 1886 "yacc.tab.c"
+#line 1891 "yacc.tab.c"
     break;
 
   case 37: /* value_list_value: LPAREN value_list_value RPAREN  */
-#line 635 "yacc.y"
+#line 640 "yacc.y"
                 { 
 			if(is_var_type_real((yyvsp[-1].expr_val).type))
 				(yyval.expr_val).value.realNum = (yyvsp[-1].expr_val).value.realNum;
@@ -1894,11 +1899,11 @@ yyreduce:
 				(yyval.expr_val).value.intNum = (yyvsp[-1].expr_val).value.intNum;
             (yyval.expr_val).type = (yyvsp[-1].expr_val).type;
 		}
-#line 1898 "yacc.tab.c"
+#line 1903 "yacc.tab.c"
     break;
 
 
-#line 1902 "yacc.tab.c"
+#line 1907 "yacc.tab.c"
 
       default: break;
     }
@@ -2091,7 +2096,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 643 "yacc.y"
+#line 648 "yacc.y"
 
 
 void yyerror(const char *s) {

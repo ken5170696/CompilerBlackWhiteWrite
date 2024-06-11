@@ -225,38 +225,43 @@ assignment:
             YYABORT; 
         } else {
             if(is_var_type_array($3.type)){
+                if(is_var_type_array($3.type)) {
+                    yyerror("Error: assigning to an array from an initializer list"); 
+                    YYABORT; 
+                }
+
                 if((var->type == INT_TYPE || var->type == REAL_TYPE)) {
-                    yyerror("You cannot asign a const to an array."); 
+                    yyerror("Error: You cannot asign a const to an array."); 
                     YYABORT; 
                 }
                 
                 if(var->arrayLength < $3.arrayLength) {
-                    yyerror("Array out of bounds."); 
+                    yyerror("Error: Array out of bounds."); 
                     YYABORT; 
                 }
-                
-                if (var->type == INT_ARRAY_TYPE) {
-                    var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
-                    for(int i = 0; i < $3.arrayLength; i++){
-                        var->value.intArr[i] = $3.value.arrayNum[i];
-                    }
 
-                    char* returnStr = getArrayString(var->value.intArr, var->arrayLength);
-                    // Return string
-                    $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
-                    sprintf($$, "%s = %s;\n", var->name, returnStr);
-                } else if (var->type == REAL_ARRAY_TYPE) {
+                // if (var->type == INT_ARRAY_TYPE) {
+                //     var->value.intArr = (int *)malloc(sizeof(int) * var->arrayLength);
+                //     for(int i = 0; i < $3.arrayLength; i++){
+                //         var->value.intArr[i] = $3.value.arrayNum[i];
+                //     }
 
-                    var->value.realArr = (float *)malloc(sizeof(float) * var->arrayLength);
-                    for(int i = 0; i < $3.arrayLength; i++){
-                        var->value.realArr[i] = $3.value.arrayNum[i];
-                    }
+                //     char* returnStr = getArrayString(var->value.intArr, var->arrayLength);
+                //     // Return string
+                //     $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                //     sprintf($$, "%s = %s;\n", var->name, returnStr);
+                // } else if (var->type == REAL_ARRAY_TYPE) {
 
-                    char* returnStr = getArrayString(var->value.realArr, var->arrayLength);
-                    // Return string
-                    $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
-                    sprintf($$, "%s = %s;\n", var->name, returnStr);
-                }
+                //     var->value.realArr = (float *)malloc(sizeof(float) * var->arrayLength);
+                //     for(int i = 0; i < $3.arrayLength; i++){
+                //         var->value.realArr[i] = $3.value.arrayNum[i];
+                //     }
+
+                //     char* returnStr = getArrayString(var->value.realArr, var->arrayLength);
+                //     // Return string
+                //     $$ = (char*)malloc(sizeof(var->name) + 12 + sizeof(returnStr));
+                //     sprintf($$, "%s = %s;\n", var->name, returnStr);
+                // }
             }else {
                 if((var->type == INT_ARRAY_TYPE || var->type == REAL_ARRAY_TYPE)) {
                     yyerror("You cannot asign an array to a const variable."); 
