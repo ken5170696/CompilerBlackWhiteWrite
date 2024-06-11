@@ -54,6 +54,17 @@ char* getArrayString(char* charArray){
     return returnStr;
 }
 
+string getExprStrStr(vector<string> exprStr){
+    string returnStr;
+    for(auto str : exprStr){
+        returnStr += str;
+        returnStr += " ";
+    }
+    returnStr.pop_back();
+
+    return returnStr;
+}
+
 variable exprValToVariable(exprVal expr){
     variable var;
 

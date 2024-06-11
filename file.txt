@@ -19,6 +19,8 @@ fun main () {
 	var complexMath: real = i + j * k - -( 6 * 5);
 	println( resultAdd );
 	println( resultMin );
+	println( i + j * k - -( 6.3 * 2) );
+	println( arrAddResult );
 	// println( resultMul );
 	// println( resultDiv );
 }

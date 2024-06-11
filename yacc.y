@@ -37,7 +37,7 @@ extern int yyparse();
 
 program:
     function {
-        cout << "#include <stdio.h>\n\n" << $1->str << endl;
+        cout << "#include <stdio.h>\n#include \"customVector.h\"\n\n" << $1->str << endl;
     }
 ;
 
@@ -55,6 +55,7 @@ function:
         $$->str = mainStr + $7->str;
     }
 ;
+
 block: 
     LBRACE { push_scope(); } statement_list RBRACE {
         pop_scope(); 
@@ -308,17 +309,17 @@ assignment:
 ;
 
 print_statement:
-    PRINT LPAREN expr RPAREN SEMICOLON 		{ 
+    PRINT LPAREN expr RPAREN SEMICOLON { 
         $$ = new StringWrapper();
 
     	if($3.type == INT_TYPE){
             stringstream ss;
-            ss << "printf(\"" << $3.value.intNum << "\");\n";
+            ss << "printf(\"%d\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
             $$->str = ss.str();
         }
     	else if($3.type == REAL_TYPE){ 
             stringstream ss;
-            ss << "printf(\"" << $3.value.realNum << "\");\n";
+            ss << "printf(\"%f\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
             $$->str = ss.str();
         } 
         else if(is_var_type_array($3.type)){
@@ -340,17 +341,17 @@ print_statement:
             $$->str = ss.str();
         }
     }
-    | PRINTLN LPAREN expr RPAREN SEMICOLON	{ 
+    | PRINTLN LPAREN expr RPAREN SEMICOLON { 
         $$ = new StringWrapper();
 
     	if($3.type == INT_TYPE){
             stringstream ss;
-            ss << "printf(\"" << $3.value.intNum << "\\n\");\n";
+            ss << "printf(\"%d\\n\"," << getExprStrStr(*($3.exprStr)) << ");\n";
             $$->str = ss.str();
         }
     	else if($3.type == REAL_TYPE){ 
             stringstream ss;
-            ss << "printf(\"" << $3.value.realNum << "\\n\");\n";
+            ss << "printf(\"%f\\n\"," << getExprStrStr(*($3.exprStr)) << ");\n";
             $$->str = ss.str();
         } 
         else if(is_var_type_array($3.type)){
@@ -392,7 +393,7 @@ type:
 ;
 
 expr:
-      value { 
+    value { 
         $$ = $1; 
     }
     | IDENTIFIER {
@@ -422,6 +423,8 @@ expr:
                     $$.value.arrayNum[i] = var->value.realArr[i];
             }
         }
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back($1->str.c_str());
     }
     | expr '+' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -463,6 +466,11 @@ expr:
                 $$.value.intNum = (v1 + v2);
             }
         }
+        $$.exprStr = new vector<string>();
+
+        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+        $$.exprStr->push_back("+");
+        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
     }
     | expr '-' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -506,6 +514,11 @@ expr:
                 $$.value.intNum = (v1 - v2);
             }
         }
+
+        $$.exprStr = new vector<string>();
+        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+        $$.exprStr->push_back("-");
+        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
     }
     | expr '*' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -555,6 +568,11 @@ expr:
                 $$.value.intNum = (v1 * v2);
             }
         }
+
+        $$.exprStr = new vector<string>();
+        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+        $$.exprStr->push_back("*");
+        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
     }
     | expr '/' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -610,6 +628,11 @@ expr:
                 }
             } 
         }
+
+        $$.exprStr = new vector<string>();
+        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+        $$.exprStr->push_back("/");
+        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
     }
     | '-' expr %prec UMINUS { 
         if(is_var_type_real($2.type) && !is_var_type_array($2.type)){
@@ -619,9 +642,16 @@ expr:
             $$.value.intNum = -$2.value.intNum;
         }
         $$.type = $2.type;
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back("-");
+        $$.exprStr->insert($$.exprStr->end(),$2.exprStr->begin(),$2.exprStr->end());
     }
     | LPAREN expr RPAREN %prec PAREN {
         $$ = $2; 
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back("(");
+        $$.exprStr->insert($$.exprStr->end(),$2.exprStr->begin(),$2.exprStr->end());
+        $$.exprStr->push_back(")");
     }
     | LBRACE value_list RBRACE {
         $$ = $2; 
@@ -632,10 +662,20 @@ value:
     REAL_CONST { 
         $$.value.realNum = $1; 
         $$.type = REAL_TYPE;
+        
+        stringstream ss;
+        ss << $1;
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back(ss.str());
     }
     | INTEGER_CONST { 
         $$.value.intNum = (float)$1;  
         $$.type = INT_TYPE;
+
+        stringstream ss;
+        ss << $1;
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back(ss.str());
     } 
     | STRING_CONST {  
         $$.value.str = (char *)malloc(strlen($1->str.c_str()));
@@ -643,6 +683,11 @@ value:
         $$.value.str[strlen($$.value.str) - 1] = '\0';
         
         $$.type = STRING_TYPE;
+        
+        stringstream ss;
+        ss << $1->str.c_str();
+        $$.exprStr = new vector<string>();
+        $$.exprStr->push_back(ss.str());
     } 
 ;
 

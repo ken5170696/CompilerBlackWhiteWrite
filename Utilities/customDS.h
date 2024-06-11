@@ -2,6 +2,7 @@
 #define CUSTOMDS_H
 
 #include <iostream>
+#include <vector>
 #include <stdio.h>
 #include <cstring>
 
@@ -34,6 +35,7 @@ typedef struct {
         float* arrayNum;
         char* str;
     } value;
+    vector<string>* exprStr;
     int arrayLength;
 } exprVal;
 
@@ -53,6 +55,8 @@ bool is_var_type_real(var_type type);
 char* getArrayString(int*, int len);
 char* getArrayString(float*, int len);
 char* getArrayString(char*);
+
+string getExprStrStr(vector<string> exprStr);
 
 variable exprValToVariable(exprVal expr);
 exprVal variableToExprVal(variable var);

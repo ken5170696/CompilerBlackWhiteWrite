@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "customVector.h"
 
 int main() 
 {
@@ -19,7 +20,9 @@ int main()
 	int resultAdd = 3;
 	int resultMin = 1;
 	float complexMath = 37;
-	printf("3\n");
-	printf("1\n");
+	printf("%d\n",resultAdd);
+	printf("%d\n",resultMin);
+	printf("%f\n",i + j * k - - ( 6.3 * 2 ));
+	printf("{-6.000000, 0.200000, 4.000000, 6.000000, 8.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000}\n");
 }
 
