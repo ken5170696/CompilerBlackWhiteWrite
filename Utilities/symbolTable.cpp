@@ -3,6 +3,7 @@
 static vector<SymbolTable*> scope_stack;
 
 char* generateTabByScopeTab(int depth){
+    depth--;
     char* tabStr = (char*)malloc(depth * 2 + 1);
     strcpy(tabStr, "");
     for(int i = 0; i < depth; i++){
@@ -42,7 +43,23 @@ void insert_variable(variable var) {
     new_node->next = current_table->head;
     current_table->head = new_node;
 }
-variable *lookup_variable_with_scope(SymbolTable *current_table, const char *name) {
+variable *lookup_variable_by_depth(int depth, const char *name) {
+    vector<SymbolTable*> temp_stack = scope_stack;
+    for(int i = 0; i < temp_stack.size(); i++) {
+        if(i >= depth)
+            break;
+        SymbolTable *current_table = temp_stack[i];
+        SymbolTableNode *current_node = current_table->head;
+        while (current_node != NULL) {
+            if (strcmp(current_node->var.name, name) == 0) {
+                return &current_node->var;
+            }
+            current_node = current_node->next;
+        }
+    }
+    return NULL;
+}
+variable *lookup_variable_by_scope(SymbolTable *current_table, const char *name) {
     if(!current_table) return NULL;
     vector<SymbolTable*> temp_stack = scope_stack;
     SymbolTableNode *current_node = current_table->head;

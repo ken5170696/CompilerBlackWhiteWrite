@@ -6,6 +6,8 @@
 void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
+
+bool havMain = false;
 %}
 
 %union {
@@ -18,13 +20,13 @@ extern int yyparse();
     typeVal type_val;
 }
 
-%token              FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE
+%token              FUN MAIN VAR PRINT PRINTLN RET IF ELSE WHILE FOR TO INT REAL NEWLINE RETURN
 %token              LBRACE RBRACE LBRACKET RBRACKET LPAREN RPAREN SEMICOLON COMMA ASSIGN COLON
 %token <intNum>   	INTEGER_CONST
 %token <realNum> 	REAL_CONST
 %token <cppStr> 	IDENTIFIER STRING_CONST
 
-%type <cppStr>      function block statement_list statement print_statement variable_declaration assignment
+%type <cppStr>      function_list function block statement_list statement print_statement variable_declaration assignment
 %type <expr_val>    expr value value_list value_list_value
 %type <type_val>    type
 
@@ -36,23 +38,91 @@ extern int yyparse();
 %%
 
 program:
-    function {
-        cout << "#include <stdio.h>\n#include \"customVector.h\"\n\n" << $1->str << endl;
+    {push_scope();} function_list {
+        if(!havMain){
+            yyerror("ERROR: function duplicate declaration"); 
+            YYABORT; 
+        }
+        cout << "#include <stdio.h>\n#include \"customVector.h\"\n\n" << $2->str << endl;
+    }
+;
+function_list:
+    function_list function{
+        int scopeCount = get_scope_count();
+        char* tabStr = generateTabByScopeTab(scopeCount);
+        
+        $$ = new StringWrapper();
+        $$->str += $1->str;
+        $$->str += tabStr;
+        $$->str += $2->str;
+        cerr << "function_list: " << $$->str << endl;
+    }
+    | function {
+        int scopeCount = get_scope_count();
+        char* tabStr = generateTabByScopeTab(scopeCount);
+
+        $$ = new StringWrapper();
+        $$->str += tabStr;
+        $$->str += $1->str;
+
+        cerr << "function: " << $$->str << endl;
     }
 ;
 
 function:
-    FUN MAIN LPAREN RPAREN block {
+    FUN IDENTIFIER LPAREN RPAREN block {
         $$ = new StringWrapper();
-        string mainStr = "int main() ";
 
-        $$->str = mainStr + $5->str;
+        variable var;
+        if(strcmp($2->str.c_str(),"main") == 0) havMain = true;
+        if (lookup_variable_by_scope(get_current_table(), $2->str.c_str())) {
+            yyerror("ERROR: function duplicate declaration"); 
+            YYABORT; 
+        } else {
+            strcpy(var.name, $2->str.c_str());
+            var.type = FUNC_TYPE;
+            var.returnType = INT_TYPE;
+
+            insert_variable(var);
+
+        }
+
+        stringstream ss;
+        
+        string typeStr;
+        if(strcmp($2->str.c_str(),"main") == 0){
+            typeStr = "int";
+        }else{
+            typeStr = "void";
+        }
+        ss << typeStr << " " << $2->str.c_str() << "() " << $5->str;
+        $$->str = ss.str();
     }
-    | FUN MAIN LPAREN RPAREN COLON type block {
+    | FUN IDENTIFIER LPAREN RPAREN COLON type block {
         $$ = new StringWrapper();
-        string mainStr = "int main() ";
 
-        $$->str = mainStr + $7->str;
+        variable var;
+        if(strcmp($2->str.c_str(),"main") == 0) havMain = true;
+        if (lookup_variable_by_scope(get_current_table(), $2->str.c_str())) {
+            yyerror("ERROR: function duplicate declaration"); 
+            YYABORT; 
+        } else {
+
+            strcpy(var.name, $2->str.c_str());
+            var.type = FUNC_TYPE;
+            var.returnType = INT_TYPE;
+            insert_variable(var);
+        }
+
+        stringstream ss;
+        string typeStr;
+        if(strcmp($2->str.c_str(),"main") == 0){
+            typeStr = "int";
+        }else{
+            typeStr = "void";
+        }
+        ss << typeStr << " " << $2->str.c_str() << "() " << $7->str;
+        $$->str = ss.str();
     }
 ;
 
@@ -73,7 +143,11 @@ block:
     }
 ;
 statement_list:
-    statement_list statement{
+    {
+        $$ = new StringWrapper();
+        $$->str = "";
+    }
+    |statement_list statement{
         int scopeCount = get_scope_count();
         char* tabStr = generateTabByScopeTab(scopeCount);
         
@@ -109,6 +183,28 @@ statement:
             $$ = new StringWrapper();
             $$->str = $1->str;
     }
+    | IDENTIFIER LPAREN RPAREN SEMICOLON{
+        $$ = new StringWrapper();
+        variable *var = lookup_variable_by_depth(get_scope_count(), $1->str.c_str());
+        if (!var) {
+            yyerror("ERROR: Variable not declared");
+            yyerror($1->str.c_str()); 
+            YYABORT; 
+        }
+        if (var->type != FUNC_TYPE) {
+            yyerror("ERROR: ID is not a function");
+            YYABORT; 
+        }
+        string str = $1->str.c_str();
+        str += "();\n";
+        $$->str = str;
+    }
+    | RETURN expr {
+        $$ = new StringWrapper();
+        string str = "return ";
+        str += getExprStrStr(*($2.exprStr));
+        $$->str = str;
+    }
 ;
 
 variable_declaration:
@@ -119,7 +215,7 @@ variable_declaration:
         strcpy(var.name, $2->str.c_str());
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable_with_scope(get_current_table(), $2->str.c_str())) {
+        if (lookup_variable_by_scope(get_current_table(), $2->str.c_str())) {
             yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
@@ -160,7 +256,7 @@ variable_declaration:
         strcpy(var.name, $2->str.c_str());
         var.type = $4.varType;
         var.arrayLength = $4.arrayLength;
-        if (lookup_variable_with_scope(get_current_table(), $2->str.c_str())) {
+        if (lookup_variable_by_scope(get_current_table(), $2->str.c_str())) {
             yyerror("ERROR: duplicate declaration"); 
             YYABORT; 
         } else {
@@ -234,7 +330,7 @@ assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
         $$ = new StringWrapper();
 
-        variable *var = lookup_variable_with_scope(get_current_table(), $1->str.c_str());
+        variable *var = lookup_variable_by_scope(get_current_table(), $1->str.c_str());
         if (!var) {
             yyerror("Variable not declared"); 
             yyerror($1->str.c_str()); 
@@ -289,7 +385,7 @@ assignment:
                         var->value.ival = $3.value.intNum;
                     }
                     stringstream ss;
-                    ss << var->name << " = " << var->value.ival << ";\n";
+                    ss << var->name << " = " << getExprStrStr(*($3.exprStr)) << ";\n";
                     $$->str = ss.str();
 
                 } else if (var->type == REAL_TYPE) {
@@ -300,7 +396,7 @@ assignment:
                     }
 
                     stringstream ss;
-                    ss << var->name << " = " << var->value.rval << ";\n";
+                    ss << var->name << " = " << getExprStrStr(*($3.exprStr)) << ";\n";
                     $$->str = ss.str();
                 }
             }
@@ -413,7 +509,7 @@ expr:
         $$ = $1; 
     }
     | IDENTIFIER {
-        variable *var = lookup_variable_with_scope(get_current_table(), $1->str.c_str());
+        variable *var = lookup_variable_by_scope(get_current_table(), $1->str.c_str());
         if (!var) {
             yyerror("ERROR: Variable not declared");
             yyerror($1->str.c_str()); 
@@ -441,6 +537,23 @@ expr:
         }
         $$.exprStr = new vector<string>();
         $$.exprStr->push_back($1->str.c_str());
+    }
+    | IDENTIFIER LPAREN RPAREN{
+        variable *var = lookup_variable_by_depth(get_scope_count(), $1->str.c_str());
+        if (!var) {
+            yyerror("ERROR: Variable not declared");
+            yyerror($1->str.c_str()); 
+            YYABORT; 
+        } else {
+            if (var->type == FUNC_TYPE) {
+                $$.type = var->type;
+                $$.returnType = var->returnType;
+            }
+        }
+        $$.exprStr = new vector<string>();
+        string str = $1->str.c_str();
+        str += "()";
+        $$.exprStr->push_back(str);
     }
     | expr '+' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);

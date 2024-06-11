@@ -29,7 +29,8 @@ void pop_scope();
 SymbolTable* get_current_table();
 void insert_variable(variable );
 variable *lookup_variable(char*);
-variable *lookup_variable_with_scope(SymbolTable*, const char*);
+variable *lookup_variable_by_depth(int depth, const char *name);
+variable *lookup_variable_by_scope(SymbolTable*, const char*);
 void printVariableData(variable*);
 
 #endif

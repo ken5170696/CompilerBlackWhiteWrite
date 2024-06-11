@@ -21,7 +21,6 @@ expressions 	([-+*/])
 "/*"([^*]|\*+[^*/])*\*+"/"  /* Ignore multi-line comments */
 
 "fun"           { return FUN; }
-"main"          { return MAIN; }
 "var"           { return VAR; }
 "int"           { return INT; }
 "real"          { return REAL; }
@@ -33,6 +32,7 @@ expressions 	([-+*/])
 "while"         { return WHILE; }
 "for"           { return FOR; }
 "to"            { return TO; }
+"return"        { return RETURN; }
 
 {strLit}        {
     StringWrapper* temp = new StringWrapper();

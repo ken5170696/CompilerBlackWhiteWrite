@@ -11,10 +11,11 @@
 
 using namespace std;
 
-typedef enum { INT_TYPE , REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE, STRING_TYPE } var_type;
+typedef enum { INT_TYPE , REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE, STRING_TYPE, FUNC_TYPE, VOID_TYPE } var_type;
 
 typedef struct {
     var_type type;
+    var_type returnType;
     union {
         int ival;
         float rval;
@@ -29,6 +30,7 @@ typedef struct {
     
 typedef struct {
     var_type type;
+    var_type returnType;
     union {
         int intNum;
         float realNum;
