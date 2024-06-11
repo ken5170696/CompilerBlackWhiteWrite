@@ -47,7 +47,6 @@ char* getArrayString(float* floatArray, int len){
     strcat(returnStr, "}");
     return returnStr;
 }
-
 char* getArrayString(char* charArray){
     char* returnStr = (char*)malloc(sizeof(charArray));
     strcpy(returnStr, charArray);

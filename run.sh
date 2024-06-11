@@ -1,7 +1,9 @@
+
 sudo make 
-./main > result.cpp
+./main > result.c
 echo "result code:"
-cat ./result.cpp
-g++ result.cpp -o result
+cat ./result.c
+g++ result.c -o result
 echo "result:"
 ./result
+sudo make clean
