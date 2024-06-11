@@ -49,12 +49,10 @@ function:
         $$->str = mainStr + $5->str;
     }
     | FUN MAIN LPAREN RPAREN COLON type block {
-        int scopeCount = get_scope_count();
-        char* tabStr = generateTabByScopeTab(scopeCount);
-
         $$ = new StringWrapper();
-        $$->str += tabStr;
-        $$->str += $1->str;
+        string mainStr = "int main() ";
+
+        $$->str = mainStr + $7->str;
     }
 ;
 block: 

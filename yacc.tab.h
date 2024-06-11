@@ -92,7 +92,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "yacc.y"
+#line 11 "yacc.y"
 
     int     intNum;
     float   realNum;
