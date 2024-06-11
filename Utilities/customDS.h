@@ -10,7 +10,7 @@
 
 using namespace std;
 
-typedef enum { INT_TYPE, REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE } var_type;
+typedef enum { INT_TYPE , REAL_TYPE, INT_ARRAY_TYPE, REAL_ARRAY_TYPE } var_type;
 
 typedef struct {
     var_type type;

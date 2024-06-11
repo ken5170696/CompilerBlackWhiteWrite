@@ -4,7 +4,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <cstring>
-#include "customDS.h"
+#include "./Utilities/customDS.h"
+#include "./Utilities/symbolTable.h"
 
 using namespace std;
 

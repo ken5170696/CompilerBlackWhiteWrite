@@ -1,36 +1,12 @@
 %{
 #include "main.h"
-#include "customDS.h"
+#include "./Utilities/customDS.h"
+#include "./Utilities/symbolTable.h"
 
 void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
-extern FILE* output_file;
 
-typedef struct SymbolTableNode {
-    variable var;
-    struct SymbolTableNode *next;
-} SymbolTableNode;
-
-SymbolTableNode *symbol_table = NULL;
-
-void insert_variable(variable var) {
-    SymbolTableNode *new_node = (SymbolTableNode *)malloc(sizeof(SymbolTableNode));
-    new_node->var = var;
-    new_node->next = symbol_table;
-    symbol_table = new_node;
-}
-
-variable *lookup_variable(char *name) {
-    SymbolTableNode *current = symbol_table;
-    while (current != NULL) {
-        if (strcmp(current->var.name, name) == 0) {
-            return &current->var;
-        }
-        current = current->next;
-    }
-    return NULL;
-}
 
 %}
 
@@ -383,6 +359,7 @@ expr:
                                             $$.value.arrayNum[i] = var->value.realArr[i];
 									}
 								}
+                                printVariableData(var);
 							}
     | expr '+' expr        
         {

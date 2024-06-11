@@ -3,8 +3,8 @@ YACC=bison
 CC=g++
 OBJECT=main
 
-$(OBJECT): lex.yy.o yacc.tab.o main.o
-		$(CC) main.o lex.yy.o yacc.tab.o -o $(OBJECT)
+$(OBJECT): lex.yy.o yacc.tab.o main.o symbolTable.o customDS.o
+		$(CC) customDS.o symbolTable.o main.o lex.yy.o yacc.tab.o -o $(OBJECT)
 
 lex.yy.o: lex.yy.c yacc.tab.h main.h
 		$(CC) -c lex.yy.c
@@ -20,6 +20,12 @@ lex.yy.c: lex.l
 
 main.o: main.cpp
 		$(CC) -c main.cpp
+
+symbolTable.o: ./Utilities/symbolTable.cpp
+		$(CC) -c ./Utilities/symbolTable.cpp
+
+customDS.o: ./Utilities/customDS.cpp
+		$(CC) -c ./Utilities/customDS.cpp
 
 clean:
 		rm -f *.o

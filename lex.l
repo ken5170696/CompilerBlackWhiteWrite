@@ -1,6 +1,7 @@
 %{
 #include "main.h"
-#include "customDS.h"
+#include "./Utilities/customDS.h"
+#include "./Utilities/symbolTable.h"
 #include "yacc.tab.h"
 %}
 
@@ -13,7 +14,6 @@ real            {digit}+"."{digit}+
 blank_chars 	([ \f\r\t\v]+)
 expressions 	([-+*/])
 
-%x COMMENT
 %%
 
 "//"(.)*\n   /* Ignore single-line comments */
