@@ -336,9 +336,12 @@ print_statement:
                 break; 
             }
             
-                stringstream ss;
-                ss << "printArray(" << getExprStrStr(*($3.exprStr)) << ", " << $3.value.arrayNum << ");\n";
-                $$->str = ss.str();
+            stringstream ss;
+            if($3.type == STRING_TYPE)
+                ss << "printf(\"" << arrayStr << "\");\n";
+            else
+                ss << "printArray(" << getExprStrStr(*($3.exprStr)) << ", " << $3.arrayLength << ");\n";
+            $$->str = ss.str();
         }
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON { 
@@ -368,9 +371,12 @@ print_statement:
                 break; 
             }
             
-                stringstream ss;
+            stringstream ss;
+            if($3.type == STRING_TYPE)
+                ss << "printf(\"" << arrayStr << "\\n\");\n";
+            else
                 ss << "printArrayln(" << getExprStrStr(*($3.exprStr)) << ", " << $3.arrayLength << ");\n";
-                $$->str = ss.str();
+            $$->str = ss.str();
         }
     }
 ;

@@ -6,4 +6,5 @@ cat ./result.c
 g++ result.c -o result
 echo "result:"
 ./result
+echo ""
 sudo make clean

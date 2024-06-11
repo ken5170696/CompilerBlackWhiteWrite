@@ -28,4 +28,4 @@ customDS.o: ./Utilities/customDS.cpp
 		$(CC) -c ./Utilities/customDS.cpp
 
 clean: 
-	rm *.o yacc.tab.* lex.yy.c
+	rm *.o yacc.tab.c yacc.tab.h lex.yy.c

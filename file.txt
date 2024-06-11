@@ -1,28 +1,9 @@
 fun main () {
-	{
-		var arrMinasdResult: real[6] = { 0, -1.2, 2, 3, 4 };
-		println( arrMinasdResult );
-	}
-	var arriVal: int[5] = { 0, -1.2, 2, 3, 4 };
-	var arrfVal: real[5] = { -6, 1.2, 2, 3, 4 };
-	var arrfVal2: real[5] = { -6, 1.2, 2, 3, 4 };
-	var arrAddResult: real[10] = arriVal + arrfVal;
-	var arrMinResult: real[10] = arriVal - arrfVal;
-	var arrMulResult: real = arriVal * arrfVal;
-	var arrDivResult: real = arriVal / arrfVal;
-	var i: int; /// sfdsdf /* 
-	i = 1; 
-	var j: real = 2;
-	var k: int = 3;
-	var resultAdd: int = j + i;
-	var resultMin: int = j - i;
-	/* var resultMul: int = j * i;
-	var resultDiv: real = j / i; */
-	var complexMath: real = i + j * k - -( 6 * 5);
-	println( resultAdd );
-	println( resultMin );
-	println( i + j * k - -( 6.3 * 2) );
-	println( arriVal * arrfVal );
-	// println( resultMul );
-	// println( resultDiv );
+	var i: real = 1.5;
+	var j: real = 3.14;
+	var k: real = 2.8;
+	print(i + j * k);
+	print("\n");
+	print(i * (j + k));
+	print("\n");
 }
