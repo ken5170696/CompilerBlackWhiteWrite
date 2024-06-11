@@ -91,31 +91,17 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 36 "yacc.y"
+#line 37 "yacc.y"
 
     int     intNum;
     float   realNum;
     char* 	str;
     variable var;
     var_type varType;
-    
-    struct {
-        int is_real;
-        int is_array;
-        union {
-            int intNum;
-            float realNum;
-            float* arrayNum;
-        } value;
-        int arrayLength;
-    } expr_val;
+    exprVal expr_val;
+    typeVal type_val;
 
-    struct {
-        int arrayLength;
-        var_type varType;
-    } type_val;
-
-#line 119 "yacc.tab.h"
+#line 105 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -1,5 +1,6 @@
 %{
 #include "main.h"
+#include "customDS.h"
 
 void yyerror(const char *s);
 extern int yylex();
@@ -39,22 +40,8 @@ variable *lookup_variable(char *name) {
     char* 	str;
     variable var;
     var_type varType;
-    
-    struct {
-        int is_real;
-        int is_array;
-        union {
-            int intNum;
-            float realNum;
-            float* arrayNum;
-        } value;
-        int arrayLength;
-    } expr_val;
-
-    struct {
-        int arrayLength;
-        var_type varType;
-    } type_val;
+    exprVal expr_val;
+    typeVal type_val;
 }
 
 

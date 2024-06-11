@@ -1,5 +1,6 @@
 %{
 #include "main.h"
+#include "customDS.h"
 #include "yacc.tab.h"
 %}
 
