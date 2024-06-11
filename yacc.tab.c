@@ -547,8 +547,8 @@ static const yytype_int16 yyrline[] =
 {
        0,    39,    39,    45,    51,    60,    60,    76,    85,    96,
      100,   104,   108,   115,   156,   234,   312,   344,   379,   382,
-     385,   389,   396,   399,   429,   475,   523,   577,   637,   649,
-     656,   662,   671,   680,   695,   703,   714,   717,   728
+     385,   389,   396,   399,   429,   488,   549,   616,   676,   688,
+     695,   701,   710,   719,   734,   742,   753,   756,   767
 };
 #endif
 
@@ -1492,12 +1492,12 @@ yyreduce:
 
     	if((yyvsp[-2].expr_val).type == INT_TYPE){
             stringstream ss;
-            ss << "printf(\"%d\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
+            ss << "printf(\"%d\"," << getExprStrStr(*((yyvsp[-2].expr_val).exprStr)) << ");\n";
             (yyval.cppStr)->str = ss.str();
         }
     	else if((yyvsp[-2].expr_val).type == REAL_TYPE){ 
             stringstream ss;
-            ss << "printf(\"%f\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
+            ss << "printf(\"%f\"," << getExprStrStr(*((yyvsp[-2].expr_val).exprStr)) << ");\n";
             (yyval.cppStr)->str = ss.str();
         } 
         else if(is_var_type_array((yyvsp[-2].expr_val).type)){
@@ -1514,9 +1514,9 @@ yyreduce:
                 break; 
             }
             
-            stringstream ss;
-            ss << "printf(\"" << arrayStr << "\");\n";
-            (yyval.cppStr)->str = ss.str();
+                stringstream ss;
+                ss << "printArray(" << getExprStrStr(*((yyvsp[-2].expr_val).exprStr)) << ", " << (yyvsp[-2].expr_val).value.arrayNum << ");\n";
+                (yyval.cppStr)->str = ss.str();
         }
     }
 #line 1523 "yacc.tab.c"
@@ -1551,9 +1551,9 @@ yyreduce:
                 break; 
             }
             
-            stringstream ss;
-            ss << "printf(\"" << arrayStr << "\\n\");\n";
-            (yyval.cppStr)->str = ss.str();
+                stringstream ss;
+                ss << "printArrayln(" << getExprStrStr(*((yyvsp[-2].expr_val).exprStr)) << ", " << (yyvsp[-2].expr_val).arrayLength << ");\n";
+                (yyval.cppStr)->str = ss.str();
         }
     }
 #line 1560 "yacc.tab.c"
@@ -1680,15 +1680,28 @@ yyreduce:
         }
         (yyval.expr_val).exprStr = new vector<string>();
 
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
-        (yyval.expr_val).exprStr->push_back("+");
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        if(isAllArray == 2 ){
+            (yyval.expr_val).exprStr->push_back("addArray(");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[-2].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[0].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(")");
+
+        } else {
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back("+");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        }
     }
-#line 1688 "yacc.tab.c"
+#line 1701 "yacc.tab.c"
     break;
 
   case 25: /* expr: expr '-' expr  */
-#line 475 "yacc.y"
+#line 488 "yacc.y"
                     {
         int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1733,15 +1746,28 @@ yyreduce:
         }
 
         (yyval.expr_val).exprStr = new vector<string>();
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
-        (yyval.expr_val).exprStr->push_back("-");
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        
+        if(isAllArray == 2 ){
+            (yyval.expr_val).exprStr->push_back("subArray(");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[-2].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[0].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(")");
+        } else {
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back("-");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        }
     }
-#line 1741 "yacc.tab.c"
+#line 1767 "yacc.tab.c"
     break;
 
   case 26: /* expr: expr '*' expr  */
-#line 523 "yacc.y"
+#line 549 "yacc.y"
                     {
         int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1792,15 +1818,28 @@ yyreduce:
         }
 
         (yyval.expr_val).exprStr = new vector<string>();
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
-        (yyval.expr_val).exprStr->push_back("*");
-        (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        
+        if(isAllArray == 2 ){
+            (yyval.expr_val).exprStr->push_back("dotArray(");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[-2].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(",");
+            (yyval.expr_val).exprStr->push_back(to_string((yyvsp[0].expr_val).arrayLength));
+            (yyval.expr_val).exprStr->push_back(")");
+        } else {
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-2].expr_val).exprStr->begin(),(yyvsp[-2].expr_val).exprStr->end());
+            (yyval.expr_val).exprStr->push_back("*");
+            (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
+        }
     }
-#line 1800 "yacc.tab.c"
+#line 1839 "yacc.tab.c"
     break;
 
   case 27: /* expr: expr '/' expr  */
-#line 577 "yacc.y"
+#line 616 "yacc.y"
                     {
         int isAllArray = is_var_type_array((yyvsp[-2].expr_val).type) + is_var_type_array((yyvsp[0].expr_val).type);
 
@@ -1861,11 +1900,11 @@ yyreduce:
         (yyval.expr_val).exprStr->push_back("/");
         (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
     }
-#line 1865 "yacc.tab.c"
+#line 1904 "yacc.tab.c"
     break;
 
   case 28: /* expr: '-' expr  */
-#line 637 "yacc.y"
+#line 676 "yacc.y"
                             { 
         if(is_var_type_real((yyvsp[0].expr_val).type) && !is_var_type_array((yyvsp[0].expr_val).type)){
             (yyval.expr_val).value.realNum = -(yyvsp[0].expr_val).value.realNum;
@@ -1878,11 +1917,11 @@ yyreduce:
         (yyval.expr_val).exprStr->push_back("-");
         (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[0].expr_val).exprStr->begin(),(yyvsp[0].expr_val).exprStr->end());
     }
-#line 1882 "yacc.tab.c"
+#line 1921 "yacc.tab.c"
     break;
 
   case 29: /* expr: LPAREN expr RPAREN  */
-#line 649 "yacc.y"
+#line 688 "yacc.y"
                                      {
         (yyval.expr_val) = (yyvsp[-1].expr_val); 
         (yyval.expr_val).exprStr = new vector<string>();
@@ -1890,19 +1929,19 @@ yyreduce:
         (yyval.expr_val).exprStr->insert((yyval.expr_val).exprStr->end(),(yyvsp[-1].expr_val).exprStr->begin(),(yyvsp[-1].expr_val).exprStr->end());
         (yyval.expr_val).exprStr->push_back(")");
     }
-#line 1894 "yacc.tab.c"
+#line 1933 "yacc.tab.c"
     break;
 
   case 30: /* expr: LBRACE value_list RBRACE  */
-#line 656 "yacc.y"
+#line 695 "yacc.y"
                                {
         (yyval.expr_val) = (yyvsp[-1].expr_val); 
     }
-#line 1902 "yacc.tab.c"
+#line 1941 "yacc.tab.c"
     break;
 
   case 31: /* value: REAL_CONST  */
-#line 662 "yacc.y"
+#line 701 "yacc.y"
                { 
         (yyval.expr_val).value.realNum = (yyvsp[0].realNum); 
         (yyval.expr_val).type = REAL_TYPE;
@@ -1912,11 +1951,11 @@ yyreduce:
         (yyval.expr_val).exprStr = new vector<string>();
         (yyval.expr_val).exprStr->push_back(ss.str());
     }
-#line 1916 "yacc.tab.c"
+#line 1955 "yacc.tab.c"
     break;
 
   case 32: /* value: INTEGER_CONST  */
-#line 671 "yacc.y"
+#line 710 "yacc.y"
                     { 
         (yyval.expr_val).value.intNum = (float)(yyvsp[0].intNum);  
         (yyval.expr_val).type = INT_TYPE;
@@ -1926,11 +1965,11 @@ yyreduce:
         (yyval.expr_val).exprStr = new vector<string>();
         (yyval.expr_val).exprStr->push_back(ss.str());
     }
-#line 1930 "yacc.tab.c"
+#line 1969 "yacc.tab.c"
     break;
 
   case 33: /* value: STRING_CONST  */
-#line 680 "yacc.y"
+#line 719 "yacc.y"
                    {  
         (yyval.expr_val).value.str = (char *)malloc(strlen((yyvsp[0].cppStr)->str.c_str()));
         strcpy((yyval.expr_val).value.str,((yyvsp[0].cppStr)->str.c_str() + 1)); 
@@ -1943,11 +1982,11 @@ yyreduce:
         (yyval.expr_val).exprStr = new vector<string>();
         (yyval.expr_val).exprStr->push_back(ss.str());
     }
-#line 1947 "yacc.tab.c"
+#line 1986 "yacc.tab.c"
     break;
 
   case 34: /* value_list: value_list COMMA value_list_value  */
-#line 695 "yacc.y"
+#line 734 "yacc.y"
                                       {
         const int len = (yyvsp[-2].expr_val).arrayLength + 1;
         float* fPtr = (float *)(realloc((yyvsp[-2].expr_val).value.arrayNum, (len) * sizeof(float)));
@@ -1956,11 +1995,11 @@ yyreduce:
         (yyval.expr_val).arrayLength = len;
         (yyval.expr_val).type = is_var_type_real((yyvsp[0].expr_val).type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
     }
-#line 1960 "yacc.tab.c"
+#line 1999 "yacc.tab.c"
     break;
 
   case 35: /* value_list: value_list_value  */
-#line 703 "yacc.y"
+#line 742 "yacc.y"
                        {
         (yyval.expr_val).value.arrayNum = (float *)malloc(sizeof(float));
         
@@ -1968,19 +2007,19 @@ yyreduce:
         (yyval.expr_val).arrayLength = 1;
         (yyval.expr_val).type = is_var_type_real((yyvsp[0].expr_val).type) ? REAL_ARRAY_TYPE : INT_ARRAY_TYPE;
     }
-#line 1972 "yacc.tab.c"
+#line 2011 "yacc.tab.c"
     break;
 
   case 36: /* value_list_value: value  */
-#line 714 "yacc.y"
+#line 753 "yacc.y"
           { 
         (yyval.expr_val) = (yyvsp[0].expr_val); 
     }
-#line 1980 "yacc.tab.c"
+#line 2019 "yacc.tab.c"
     break;
 
   case 37: /* value_list_value: '-' value_list_value  */
-#line 717 "yacc.y"
+#line 756 "yacc.y"
                                         { 
         if(!is_var_type_array((yyvsp[0].expr_val).type)){
             if(is_var_type_real((yyvsp[0].expr_val).type)){
@@ -1992,11 +2031,11 @@ yyreduce:
             (yyval.expr_val).type = (yyvsp[0].expr_val).type;
         }
     }
-#line 1996 "yacc.tab.c"
+#line 2035 "yacc.tab.c"
     break;
 
   case 38: /* value_list_value: LPAREN value_list_value RPAREN  */
-#line 728 "yacc.y"
+#line 767 "yacc.y"
                                      { 
         if(is_var_type_real((yyvsp[-1].expr_val).type))
             (yyval.expr_val).value.realNum = (yyvsp[-1].expr_val).value.realNum;
@@ -2004,11 +2043,11 @@ yyreduce:
             (yyval.expr_val).value.intNum = (yyvsp[-1].expr_val).value.intNum;
         (yyval.expr_val).type = (yyvsp[-1].expr_val).type;
     }
-#line 2008 "yacc.tab.c"
+#line 2047 "yacc.tab.c"
     break;
 
 
-#line 2012 "yacc.tab.c"
+#line 2051 "yacc.tab.c"
 
       default: break;
     }
@@ -2201,7 +2240,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 736 "yacc.y"
+#line 775 "yacc.y"
 
 
 void yyerror(const char *s) {

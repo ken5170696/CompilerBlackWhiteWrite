@@ -4,6 +4,7 @@ fun main () {
 	}
 	var arriVal: int[5] = { 0, -1.2, 2, 3, 4 };
 	var arrfVal: real[5] = { -6, 1.2, 2, 3, 4 };
+	var arrfVal2: real[5] = { -6, 1.2, 2, 3, 4 };
 	var arrAddResult: real[10] = arriVal + arrfVal;
 	var arrMinResult: real[10] = arriVal - arrfVal;
 	var arrMulResult: real = arriVal * arrfVal;
@@ -20,7 +21,7 @@ fun main () {
 	println( resultAdd );
 	println( resultMin );
 	println( i + j * k - -( 6.3 * 2) );
-	println( arrAddResult );
+	println( arriVal * arrfVal );
 	// println( resultMul );
 	// println( resultDiv );
 }

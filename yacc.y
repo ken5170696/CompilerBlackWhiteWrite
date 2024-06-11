@@ -314,12 +314,12 @@ print_statement:
 
     	if($3.type == INT_TYPE){
             stringstream ss;
-            ss << "printf(\"%d\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
+            ss << "printf(\"%d\"," << getExprStrStr(*($3.exprStr)) << ");\n";
             $$->str = ss.str();
         }
     	else if($3.type == REAL_TYPE){ 
             stringstream ss;
-            ss << "printf(\"%f\"," << "getExprStrStr(*($3.exprStr))" << ");\n";
+            ss << "printf(\"%f\"," << getExprStrStr(*($3.exprStr)) << ");\n";
             $$->str = ss.str();
         } 
         else if(is_var_type_array($3.type)){
@@ -336,9 +336,9 @@ print_statement:
                 break; 
             }
             
-            stringstream ss;
-            ss << "printf(\"" << arrayStr << "\");\n";
-            $$->str = ss.str();
+                stringstream ss;
+                ss << "printArray(" << getExprStrStr(*($3.exprStr)) << ", " << $3.value.arrayNum << ");\n";
+                $$->str = ss.str();
         }
     }
     | PRINTLN LPAREN expr RPAREN SEMICOLON { 
@@ -368,9 +368,9 @@ print_statement:
                 break; 
             }
             
-            stringstream ss;
-            ss << "printf(\"" << arrayStr << "\\n\");\n";
-            $$->str = ss.str();
+                stringstream ss;
+                ss << "printArrayln(" << getExprStrStr(*($3.exprStr)) << ", " << $3.arrayLength << ");\n";
+                $$->str = ss.str();
         }
     }
 ;
@@ -468,9 +468,22 @@ expr:
         }
         $$.exprStr = new vector<string>();
 
-        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
-        $$.exprStr->push_back("+");
-        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        if(isAllArray == 2 ){
+            $$.exprStr->push_back("addArray(");
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($1.arrayLength));
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($3.arrayLength));
+            $$.exprStr->push_back(")");
+
+        } else {
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back("+");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        }
     }
     | expr '-' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -516,9 +529,22 @@ expr:
         }
 
         $$.exprStr = new vector<string>();
-        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
-        $$.exprStr->push_back("-");
-        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        
+        if(isAllArray == 2 ){
+            $$.exprStr->push_back("subArray(");
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($1.arrayLength));
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($3.arrayLength));
+            $$.exprStr->push_back(")");
+        } else {
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back("-");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        }
     }
     | expr '*' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
@@ -570,9 +596,22 @@ expr:
         }
 
         $$.exprStr = new vector<string>();
-        $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
-        $$.exprStr->push_back("*");
-        $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        
+        if(isAllArray == 2 ){
+            $$.exprStr->push_back("dotArray(");
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($1.arrayLength));
+            $$.exprStr->push_back(",");
+            $$.exprStr->push_back(to_string($3.arrayLength));
+            $$.exprStr->push_back(")");
+        } else {
+            $$.exprStr->insert($$.exprStr->end(),$1.exprStr->begin(),$1.exprStr->end());
+            $$.exprStr->push_back("*");
+            $$.exprStr->insert($$.exprStr->end(),$3.exprStr->begin(),$3.exprStr->end());
+        }
     }
     | expr '/' expr {
         int isAllArray = is_var_type_array($1.type) + is_var_type_array($3.type);
